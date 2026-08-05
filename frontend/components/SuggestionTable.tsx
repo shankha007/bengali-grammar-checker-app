@@ -41,7 +41,11 @@ export default function SuggestionTable({
   }
 
   return (
-    <div className="scroll-y h-full">
+    // h-full fills the desktop pane, which has a definite height. On mobile the
+    // pane is capped rather than fixed, so the table shrinks to its rows — four
+    // suggestions used to sit above half a screen of white — and starts
+    // scrolling only once it reaches the cap.
+    <div className="scroll-y h-full max-lg:h-auto max-lg:max-h-[45vh]">
       <table className="tbl tbl-fixed">
         <thead>
           <tr>

@@ -35,7 +35,15 @@ export default function DetailPane({
   }
 
   return (
-    <div className="scroll-y h-full px-3 py-2">
+    // h-full fills the desktop pane and scrolls inside it. On mobile the pane
+    // sizes to content, so this must not force a height it cannot honour —
+    // `h-auto` there lets the explanation be read in full instead of scrolled
+    // inside a sliver. The testid is what the mobile pass in scripts/e2e.mjs
+    // measures; this is the pane whose content was being cut off.
+    <div
+      data-testid="detail-pane"
+      className="scroll-y h-full px-3 py-2 max-lg:h-auto max-lg:overflow-visible"
+    >
       <div className="mb-1.5 flex items-center gap-2">
         <span
           aria-hidden

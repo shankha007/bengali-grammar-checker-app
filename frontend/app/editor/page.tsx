@@ -287,6 +287,10 @@ export default function Page() {
         }
         data-testid="app-grid"
       >
+        {/* Below lg the panes stack and the page scrolls, so only the editor
+            keeps a viewport-relative height — it is a writing surface, and a
+            predictable chunk of screen is what you want from one. The panes
+            below it size to their content instead; see the middle column. */}
         <section className="panel min-h-0 overflow-hidden max-lg:h-[45vh]">
           <Editor
             edits={visibleEdits}
@@ -310,11 +314,20 @@ export default function Page() {
           onReset={() => reset("mid")}
         />
 
+        {/* The three-row grid is desktop-only. It used to apply at every width,
+            which meant a phone got `1fr / 6px / var(--row-detail)` inside a
+            60vh box with --row-detail still holding a desktop pixel value — so
+            the detail pane was handed less height than one wrapped line needs
+            and `overflow-hidden` cut the explanation off mid-sentence. Below lg
+            the two panes simply stack. */}
         <section
-          className="grid min-h-0 grid-rows-[minmax(0,1fr)_6px_var(--row-detail)] gap-0 max-lg:h-[60vh]"
+          className="min-h-0 max-lg:flex max-lg:flex-col max-lg:gap-2 lg:grid lg:grid-rows-[minmax(0,1fr)_6px_var(--row-detail)] lg:gap-0"
           style={{ "--row-detail": `${layout.detail}px` } as React.CSSProperties}
         >
-          <div className="panel min-h-0 overflow-hidden">
+          {/* Capped, not fixed: the table shrinks to however many suggestions
+              there are and scrolls internally past the cap, so a short list
+              does not strand the explanation below a screen of white. */}
+          <div className="panel min-h-0 overflow-hidden max-lg:h-auto">
             <SuggestionTable
               edits={visibleEdits}
               outOfScope={outOfScope}
@@ -336,7 +349,9 @@ export default function Page() {
             onReset={() => reset("detail")}
           />
 
-          <div className="panel min-h-0 overflow-hidden">
+          {/* Content height on mobile. This is the pane that answers "why was
+              this flagged", and clipping the answer defeats the product. */}
+          <div className="panel min-h-0 overflow-hidden max-lg:h-auto max-lg:overflow-visible">
             <DetailPane
               edit={selected}
               onAccept={(s) => selected && accept(selected, s)}
@@ -359,7 +374,10 @@ export default function Page() {
           onReset={() => reset("side")}
         />
 
-        <aside className="panel flex min-h-0 flex-col overflow-hidden max-lg:h-[45vh]">
+        {/* Readability and the reference tabs. Content height on mobile: a
+            fixed 45vh left a tall empty box under short tab content and a
+            scrollbar inside a page that already scrolls. */}
+        <aside className="panel flex min-h-0 flex-col overflow-hidden max-lg:h-auto">
           <div
             role="tablist"
             className="flex shrink-0 border-b"
@@ -382,7 +400,11 @@ export default function Page() {
               </button>
             ))}
           </div>
-          <div className="min-h-0 flex-1 overflow-hidden">
+          {/* `overflow-hidden` is desktop's business: there the pane has a
+              fixed height and each panel scrolls inside it. With an auto height
+              on mobile it would clip whatever did not fit rather than letting
+              the page scroll to it. */}
+          <div className="min-h-0 flex-1 overflow-hidden max-lg:overflow-visible">
             {tab === "readability" && <ReadabilityPanel result={result} />}
             {tab === "classes" && (
               <TaxonomyPanel classes={classes} counts={countsByClass} />

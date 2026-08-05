@@ -150,7 +150,100 @@ const main = async () => {
     );
   }
 
+  // --- mobile layout ------------------------------------------------------
+  //
+  // The desktop cases above pass on a phone too — the checker does not care
+  // about viewport width — and the layout was broken there anyway: the middle
+  // column kept its desktop three-row grid inside a 60vh box, so the pane
+  // holding "why was this flagged" was given less height than one wrapped line
+  // and cut the explanation off mid-sentence.
+  //
+  // Nothing above would have caught it. These assertions are about geometry:
+  // no sideways scroll, and no element hiding content behind overflow:hidden.
+  const phone = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    locale: "bn-BD",
+    isMobile: true,
+    hasTouch: true,
+  });
+  const small = await phone.newPage();
+  small.setDefaultTimeout(60000);
+
+  let mobileFailures = 0;
+  for (const path of ["/", "/editor", "/analytics"]) {
+    await small.goto(`${BASE}${path}`, { waitUntil: "domcontentloaded" });
+
+    if (path === "/editor") {
+      const box = small.locator(".bs-editor .ProseMirror");
+      await box.waitFor({ state: "visible" });
+      await box.click();
+      await small.keyboard.type("সব ছাত্ররা মাঠে খেলছে। এর কারন কী কেউ জানে না।");
+      await small.waitForSelector(".bs-flag");
+      // Select a row: the detail pane is empty until something is chosen, and
+      // an empty pane cannot demonstrate that it no longer clips.
+      const row = small.locator("table.tbl tbody tr").first();
+      if (await row.count()) await row.click();
+    }
+    await small.waitForTimeout(1200);
+
+    const geometry = await small.evaluate(() => {
+      const de = document.documentElement;
+
+      // Panes squeezed to a sliver. This is the shape the bug took: the pane
+      // was still *scrollable*, so nothing overflowed by the usual test — it
+      // was simply too short to show a line of text, and the explanation
+      // appeared cut in half. Height is the honest measure, not overflow.
+      const slivers = [];
+      document.querySelectorAll(".panel").forEach((el) => {
+        const box = el.getBoundingClientRect();
+        if (box.height > 0 && box.height < 48 && el.textContent.trim()) {
+          slivers.push(
+            `${el.tagName}.${String(el.className).slice(0, 40)} h=${Math.round(box.height)}`,
+          );
+        }
+      });
+
+      // The pane that answers "why was this flagged" must show its answer,
+      // not scroll it inside a box the size of one line.
+      const detail = document.querySelector("[data-testid=detail-pane]");
+      const detailCut =
+        detail && detail.scrollHeight > detail.clientHeight + 2
+          ? `detail-pane content=${detail.scrollHeight} box=${detail.clientHeight}`
+          : null;
+
+      const wide = [...document.querySelectorAll("*")]
+        .filter((el) => el.getBoundingClientRect().right > window.innerWidth + 1)
+        .slice(0, 5)
+        .map((el) => `${el.tagName}.${String(el.className).slice(0, 40)}`);
+
+      return {
+        hScroll: de.scrollWidth > de.clientWidth + 1,
+        wide,
+        slivers: slivers.slice(0, 5),
+        detailCut,
+        detailFound: Boolean(detail),
+      };
+    });
+
+    const ok =
+      !geometry.hScroll && geometry.slivers.length === 0 && !geometry.detailCut;
+    if (!ok) mobileFailures += 1;
+    console.log(
+      `${ok ? "ok  " : "FAIL"} mobile ${path.padEnd(16)} ` +
+        `hScroll=${geometry.hScroll} slivers=${geometry.slivers.length}` +
+        (path === "/editor" ? ` detail=${geometry.detailFound ? "shown" : "MISSING"}` : ""),
+    );
+    if (geometry.detailCut) console.log(`        ${geometry.detailCut}`);
+    for (const entry of geometry.slivers) console.log(`        sliver: ${entry}`);
+    for (const entry of geometry.wide) console.log(`        overflows: ${entry}`);
+  }
+
   await browser.close();
+
+  if (mobileFailures) {
+    console.error(`${mobileFailures} mobile layout failure(s)`);
+    process.exitCode = 1;
+  }
 
   if (consoleErrors.length) {
     console.error("\nCONSOLE ERRORS:");
