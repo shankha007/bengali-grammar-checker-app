@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!--
+    Tab icon. Next.js picks this up from app/icon.svg and emits the <link> itself.
+
+    Deliberately a simplified Logo.tsx: the back-stays and the waterline survive
+    at 34px in the nav and turn into grey mush at the 16px a browser tab actually
+    renders. Deck, towers and cable are the parts that still read.
+  -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2f6df6"/>
+      <stop offset="100%" stop-color="#0e8ea8"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="32" height="32" rx="7" fill="url(#g)"/>
+  <rect x="9.4" y="8.6" width="2.7" height="16.2" rx="1.35" fill="#ffffff"/>
+  <rect x="19.9" y="8.6" width="2.7" height="16.2" rx="1.35" fill="#ffffff"/>
+  <rect x="3.4" y="12.2" width="25.2" height="2.9" rx="1.45" fill="#ffffff"/>
+  <path d="M10.75 15.1 Q16 23.2 21.25 15.1" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

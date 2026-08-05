@@ -1,0 +1,444 @@
+# সাধু ও চলিত রীতি - register markers for গুরুচণ্ডালী দোষ detection.
+#
+# গুরুচণ্ডালী দোষ is mixing সাধু and চলিত forms inside one sentence. It is the
+# flagship feature (spec §3) and, unusually for this taxonomy, it is genuinely
+# tractable with a lexical rule: the two registers differ in a closed, listable
+# set of pronouns and verb endings. Detection does not need a model. Deciding
+# which direction to convert a whole *document* does, which is why conversion is
+# Phase 4.
+#
+# The rule fires on co-occurrence WITHIN A SENTENCE. Across sentences it is
+# REGISTER_INCONSISTENCY (document-level drift), a different class with a
+# different threshold.
+#
+# `pairs` is bidirectional and drives both the explanation and the Phase 4
+# সাধু↔চলিত converter.
+
+pairs:
+  # pronouns and demonstratives
+  - sadhu: "তাহার"
+    cholito: "তার"
+  - sadhu: "তাহাকে"
+    cholito: "তাকে"
+  - sadhu: "তাহারা"
+    cholito: "তারা"
+  - sadhu: "তাহা"
+    cholito: "তা"
+  - sadhu: "ইহা"
+    cholito: "এটা"
+  - sadhu: "ইহার"
+    cholito: "এর"
+  - sadhu: "ইহাকে"
+    cholito: "একে"
+  - sadhu: "উহা"
+    cholito: "ওটা"
+  - sadhu: "যাহা"
+    cholito: "যা"
+  - sadhu: "যাহার"
+    cholito: "যার"
+  - sadhu: "মোদের"
+    cholito: "আমাদের"
+  - sadhu: "আমাদিগের"
+    cholito: "আমাদের"
+  - sadhu: "তোমাদিগকে"
+    cholito: "তোমাদের"
+
+  # verbs
+  - sadhu: "করিয়া"
+    cholito: "করে"
+  - sadhu: "করিতে"
+    cholito: "করতে"
+  - sadhu: "করিতেছে"
+    cholito: "করছে"
+  - sadhu: "করিয়াছে"
+    cholito: "করেছে"
+  - sadhu: "করিল"
+    cholito: "করল"
+  - sadhu: "হইল"
+    cholito: "হলো"
+  # One-character stems (হ-, দ-, ন-, ল-) cannot be handled by the stem-length
+  # guard in `sadhu_endings_guarded`, so their সাধু paradigms are listed.
+  # হওয়া is the commonest verb in the language; leaving হইলেন unlabelled made
+  # the cholito ending "লেন" match it and turned correct সাধু prose into a
+  # গুরুচণ্ডালী false positive.
+  - sadhu: "হইলেন"
+    cholito: "হলেন"
+  - sadhu: "হইলাম"
+    cholito: "হলাম"
+  - sadhu: "হইয়াছে"
+    cholito: "হয়েছে"
+  - sadhu: "হইয়াছিল"
+    cholito: "হয়েছিল"
+  - sadhu: "হইতেছে"
+    cholito: "হচ্ছে"
+  - sadhu: "লইলেন"
+    cholito: "নিলেন"
+  - sadhu: "হইতে"
+    cholito: "হতে"
+  - sadhu: "হইয়া"
+    cholito: "হয়ে"
+  - sadhu: "হইবে"
+    cholito: "হবে"
+  - sadhu: "যাইতে"
+    cholito: "যেতে"
+  - sadhu: "গিয়াছে"
+    cholito: "গেছে"
+  - sadhu: "আসিয়া"
+    cholito: "এসে"
+  - sadhu: "বলিয়া"
+    cholito: "বলে"
+  - sadhu: "বলিল"
+    cholito: "বলল"
+  - sadhu: "দেখিয়া"
+    cholito: "দেখে"
+  - sadhu: "দিয়াছে"
+    cholito: "দিয়েছে"
+  - sadhu: "লইয়া"
+    cholito: "নিয়ে"
+  - sadhu: "থাকিয়া"
+    cholito: "থেকে"
+  - sadhu: "কহিল"
+    cholito: "বলল"
+  - sadhu: "শুনিয়া"
+    cholito: "শুনে"
+  - sadhu: "পড়িয়া"
+    cholito: "পড়ে"
+  - sadhu: "খাইয়া"
+    cholito: "খেয়ে"
+  - sadhu: "রহিল"
+    cholito: "রইল"
+
+  # Honorific সাধু forms whose stem carries a full ই rather than a ি-কার, so no
+  # productive ending can reach them: হইবেন is হ+ই+ব+ে+ন, and `িবেন` does not
+  # match it the way it matches করিবেন. Same reason হইয়া and হইলেন are listed.
+  - sadhu: "হইবেন"
+    cholito: "হবেন"
+  - sadhu: "যাইবেন"
+    cholito: "যাবেন"
+  - sadhu: "আসিয়াছেন"
+    cholito: "এসেছেন"
+  - sadhu: "গিয়াছেন"
+    cholito: "গেছেন"
+
+  # চলিত future. Until these were listed, "লোকটি কহিল সে যাবে।" carried a সাধু
+  # marker and no চলিত marker at all, so the clash never fired — the sentence
+  # read as consistent সাধু prose. Future tense is where a writer slipping
+  # between registers is most likely to be caught, which made this the widest
+  # hole in the detector.
+  - sadhu: "করিবে"
+    cholito: "করবে"
+  - sadhu: "করিবেন"
+    cholito: "করবেন"
+  - sadhu: "যাইবে"
+    cholito: "যাবে"
+  - sadhu: "খাইবে"
+    cholito: "খাবে"
+  - sadhu: "বলিবে"
+    cholito: "বলবে"
+  - sadhu: "আসিবে"
+    cholito: "আসবে"
+  - sadhu: "দেখিবে"
+    cholito: "দেখবে"
+  - sadhu: "থাকিবে"
+    cholito: "থাকবে"
+  - sadhu: "পাইবে"
+    cholito: "পাবে"
+  - sadhu: "দিবে"
+    cholito: "দেবে"
+  - sadhu: "লইবে"
+    cholito: "নেবে"
+
+  # First-person সাধু future. "আমি শাড়ি পরে বিদ্যালয়ে যাইব" mixes the চলিত
+  # participle পরে with the সাধু যাইব — the textbook গুরুচণ্ডালী — and neither
+  # word was a marker, so the sentence read as consistent prose.
+  - sadhu: "যাইব"
+    cholito: "যাব"
+  - sadhu: "খাইব"
+    cholito: "খাব"
+  - sadhu: "করিব"
+    cholito: "করব"
+  - sadhu: "বলিব"
+    cholito: "বলব"
+  - sadhu: "দেখিব"
+    cholito: "দেখব"
+  - sadhu: "আসিব"
+    cholito: "আসব"
+  - sadhu: "থাকিব"
+    cholito: "থাকব"
+  - sadhu: "পাইব"
+    cholito: "পাব"
+  - sadhu: "হইব"
+    cholito: "হব"
+  - sadhu: "লিখিব"
+    cholito: "লিখব"
+
+  # Irregular under the regular derivation below, and therefore load-bearing:
+  # without these the ending swap produces চাহে for চাহিয়া and রহে for রহিয়া.
+  # Stems ending in হ lose it and take -য়ে, and one-character stems keep their
+  # vowel (গিয়া is গিয়ে, not গে). `pairs` is consulted first precisely so the
+  # regular rule never gets to be wrong about these.
+  - sadhu: "চাহিয়া"
+    cholito: "চেয়ে"
+  - sadhu: "রহিয়া"
+    cholito: "রয়ে"
+  - sadhu: "বহিয়া"
+    cholito: "বয়ে"
+  - sadhu: "সহিয়া"
+    cholito: "সয়ে"
+  - sadhu: "কহিয়া"
+    cholito: "বলে"
+  - sadhu: "গিয়া"
+    cholito: "গিয়ে"
+  - sadhu: "দিয়া"
+    cholito: "দিয়ে"
+  - sadhu: "নিয়া"
+    cholito: "নিয়ে"
+  - sadhu: "লইয়াছে"
+    cholito: "নিয়েছে"
+  - sadhu: "কহিতেছে"
+    cholito: "বলছে"
+  - sadhu: "কহিলেন"
+    cholito: "বললেন"
+  - sadhu: "চাহিলেন"
+    cholito: "চাইলেন"
+  - sadhu: "রহিলাম"
+    cholito: "রইলাম"
+  - sadhu: "রহিলেন"
+    cholito: "রইলেন"
+
+# Productive endings. Order of evaluation is load-bearing: সাধু is tested before
+# চলিত, because সাধু forms are supersets (করিতেছে also ends in ছে).
+#
+# `sadhu_endings` are unambiguous - no চলিত form ends this way.
+sadhu_endings:
+  - "িয়া"
+  - "িয়াছে"
+  - "িয়াছি"
+  - "িয়াছিল"
+  - "িতেছে"
+  - "িতেছি"
+  - "িতেছেন"
+  - "িতেছিল"
+  # The honorific (-েন) column. Its absence was a detector bug rather than a
+  # gap: the চলিত ending "ছেন" matched গিয়াছেন / করিয়াছেন first, so সাধু
+  # honorific prose came back labelled চলিত — the one label that both silences a
+  # real clash and puts a pure সাধু sentence at risk of a false positive.
+  - "িয়াছেন"
+  - "িয়াছিলে"
+  - "িয়াছিলেন"
+  - "িয়াছিলাম"
+  - "িতেছিলেন"
+  - "িতেছিলাম"
+  # The same paradigm on vowel-final roots (খা-, যা-, পা-, হ-, ল-), which take a
+  # full ই where consonant-final roots take a ি-কার: করিতেছিলেন but
+  # খাইতেছিলেন. Without these, খাইতেছিলেন fell through to the চলিত "ছিলেন" and
+  # a সাধু verb was counted as evidence of চলিত.
+  - "ইয়া"
+  - "ইয়াছে"
+  - "ইয়াছি"
+  - "ইয়াছেন"
+  - "ইয়াছিল"
+  - "ইয়াছিলেন"
+  - "ইতেছে"
+  - "ইতেছি"
+  - "ইতেছেন"
+  - "ইতেছিল"
+  - "ইতেছিলেন"
+  - "ইতেছিলাম"
+
+# চলিত forms that must be decided BEFORE the guarded সাধু endings below.
+#
+# বলছিলে ends in `িলে` with a three-character stem (বলছ), so the stem-length
+# guard happily calls it সাধু — but it is ordinary চলিত past continuous. The
+# same trap catches করছিলাম (`িলাম`) and বলছিলেন (`িলেন`), which means this was
+# already mislabelling চলিত prose before the future-tense endings were added;
+# adding them just made it visible in the gold set.
+#
+# The সাধু counterparts are safe: করিয়াছিল and করিতেছিলেন match the unambiguous
+# `sadhu_endings` list, which is tested ahead of everything here.
+cholito_endings_priority:
+  - "ছিল"
+  - "ছিলে"
+  - "ছিলাম"
+  - "ছিলেন"
+  - "ছিলি"
+
+# `sadhu_endings_guarded` need a minimum stem length, and this is the subtle one.
+# করিলাম is সাধু (stem কর + িলাম). দিলাম is চলিত (stem দি + লাম) and happens to
+# end in the same four characters. The two are separable only by stem length: a
+# one-character stem means the ি belongs to the stem, not to the ending.
+# Without this guard, দিলাম / নিলাম / দিলেন all get mislabelled সাধু and every
+# ordinary চলিত sentence containing them turns into a false গুরুচণ্ডালী flag.
+sadhu_endings_guarded:
+  - "িলাম"
+  - "িলেন"
+  - "িতাম"
+  - "িতে"
+  - "িতেন"
+  - "িলে"
+  # সাধু future. The same guard separates করিবে (সাধু, stem কর) from দিবে and
+  # নিবে (one-character stems, and চলিত-adjacent enough that labelling them
+  # সাধু would flag ordinary prose).
+  - "িবে"
+  - "িবেন"
+sadhu_guard_min_stem: 2
+
+# ...and a stem-length guard is not enough on its own, because the guarded
+# endings collide with the locative case, not just with চলিত verbs:
+#
+#     টেবিলে   ট+ে+ব + িলে   stem "টেব", three characters, passes the guard
+#     বইটিতে   ব+ই+ট + িতে   stem "বইট"
+#
+# Both were coming back সাধু, so any ordinary চলিত sentence mentioning a table
+# earned a গুরুচণ্ডালী flag. A locative noun is not a verb, and the guarded
+# endings are verb morphology, so the ending only counts when what precedes it
+# is a verb root.
+#
+# Closed list, deliberately: Bengali has a few hundred roots and this covers the
+# common ones. A সাধু form built on an unlisted root goes unlabelled — a miss,
+# which F0.5 forgives, rather than a false positive, which it does not.
+# Applies to `sadhu_endings_guarded` only; the unambiguous endings above are
+# distinctive enough to stand alone.
+#
+# বাড় (to grow) is NOT here on purpose: listing it would make বাড়িতে — "at
+# home", one of the commonest words in the language — a সাধু marker again.
+verb_stems:
+  - "কর"
+  - "কিন"
+  - "বল"
+  - "দেখ"
+  - "শুন"
+  - "শোন"
+  - "পড়"
+  - "লিখ"
+  - "খা"
+  - "যা"
+  - "আস"
+  - "থাক"
+  - "রহ"
+  - "কহ"
+  - "চাহ"
+  - "বস"
+  - "ফির"
+  - "উঠ"
+  - "চল"
+  - "ধর"
+  - "ছাড়"
+  - "রাখ"
+  - "তোল"
+  - "বুঝ"
+  - "শিখ"
+  - "জান"
+  - "মান"
+  - "ডাক"
+  - "কাট"
+  - "হাস"
+  - "মার"
+  - "আন"
+  - "খুল"
+  - "ভাব"
+  - "পাঠ"
+  - "গড়"
+  - "ঘুমা"
+  - "দাঁড়া"
+
+# `িব` is deliberately absent from the list above. It would catch করিব, but the
+# guard cannot save গরিব (গ+র+ি+ব) — a two-character stem and one of the
+# commonest বিদেশি adjectives in the language. One productive সাধু form is not
+# worth mislabelling it.
+
+# চলিত endings. Only reached if no সাধু rule matched first.
+cholito_endings:
+  - "চ্ছে"
+  - "চ্ছি"
+  - "েছে"
+  - "েছি"
+  - "েছ"
+  - "ছেন"
+  - "ছে"
+  - "ছি"
+  - "লেন"
+  - "লাম"
+  # চলিত honorific future: করবেন, যাবেন, দেখবেন. Safe as a productive ending
+  # because the সাধু counterpart `িবেন` is tested first, and almost nothing
+  # outside this paradigm ends in বেন.
+  - "বেন"
+
+# `বে` is NOT a চলিত ending here, however tempting: করবে and যাবে would be
+# caught, and so would ভাবে, স্বভাবে, প্রভাবে, গৌরবে — the locative of every
+# noun ending in ব. That turns pure সাধু prose containing "এইভাবে" into a
+# গুরুচণ্ডালী false positive. The চলিত futures worth having are listed
+# individually in `pairs` instead.
+
+# Deriving the চলিত form when `pairs` has no entry.
+#
+# The endings above are productive — বসিয়া, উঠিয়া, ফিরিয়া and a hundred more
+# are all detected — but `pairs` is a fixed list, so most of what the detector
+# catches had no correction to offer. The user saw:
+#
+#     চলিত রীতিতে “” লিখুন।
+#
+# For the ি-কার paradigms the mapping is regular: strip the সাধু ending, add the
+# চলিত one. বসিয়া → বসে, করিতেছেন → করছেন, উঠিলাম → উঠলাম.
+#
+# `pairs` still wins where it has an entry, because the regular derivation is
+# wrong for exactly the verbs that are listed there: করিয়া is করে, not করিয়ে.
+#
+# The ই-stem forms (হইয়া, খাইয়া, গিয়া) are NOT derivable — খাইয়া is খেয়ে,
+# not খায়ে, and the stem vowel changes in a way no suffix rule recovers. They
+# stay in `pairs`, and anything still underivable falls back to the no-fix
+# explanation rather than an empty pair of quotes.
+cholito_derivation:
+  min_stem: 2
+  endings:
+    "িয়া": "ে"
+    "িয়াছে": "েছে"
+    "িয়াছি": "েছি"
+    "িয়াছেন": "েছেন"
+    "িয়াছিল": "েছিল"
+    "িয়াছিলে": "েছিলে"
+    "িয়াছিলেন": "েছিলেন"
+    "িয়াছিলাম": "েছিলাম"
+    "িতেছে": "ছে"
+    "িতেছি": "ছি"
+    "িতেছেন": "ছেন"
+    "িতেছিল": "ছিল"
+    "িতেছিলেন": "ছিলেন"
+    "িতেছিলাম": "ছিলাম"
+    "িতে": "তে"
+    "িলাম": "লাম"
+    "িলেন": "লেন"
+    "িলে": "লে"
+    "িল": "ল"
+    "িতাম": "তাম"
+    "িতেন": "তেন"
+    "িবে": "বে"
+    "িবেন": "বেন"
+    "িব": "ব"
+
+# চলিত markers that only count in context.
+#
+# পরে is two different words. After a garment it is the চলিত conjunctive
+# participle — "শাড়ি পরে" is "having put on a saree", whose সাধু form is
+# পরিয়া — and it is then exactly as much a চলিত marker as করে or খেয়ে.
+# Everywhere else it is the postposition "after", which is register-neutral and
+# turns up constantly in সাধু prose ("কিছুক্ষণ পরে তিনি আসিলেন")। Listing পরে
+# unconditionally would flag that correct sentence.
+#
+# The garment list is the same evidence data/confusions.yaml uses to tell
+# পড়ে (reading) from পরে (wearing).
+cholito_markers_in_context:
+  - word: "পরে"
+    sadhu: "পরিয়া"
+    after: ["শাড়ি", "জামা", "পোশাক", "জুতা", "জুতো", "পাঞ্জাবি", "ওড়না",
+            "শার্ট", "টুপি", "গয়না", "চশমা"]
+
+detection:
+  # Both a সাধু marker and a চলিত marker in the same sentence.
+  min_markers_each: 1
+  confidence: 0.74
+  # Document-level drift: fraction of sentences in the minority register that
+  # still counts as inconsistency rather than a deliberate quoted passage.
+  drift_min_sentences: 4
+  drift_minority_ratio: 0.15
+  drift_confidence: 0.58

@@ -1,0 +1,90 @@
+# Dev stack. Phase 1 only needs `backend`; the rest are declared now so the
+# topology is settled before code starts depending on it.
+#
+# `vllm` is intentionally commented out: it is a Phase 2 concern, it needs a GPU,
+# and a service that fails to start on every developer's laptop trains people to
+# ignore compose errors.
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    volumes:
+      - ./src:/app/src
+      - ./eval:/app/eval
+      - ./tests:/app/tests
+    environment:
+      PYTHONPATH: /app/src
+      PYTHONIOENCODING: utf-8
+      DATABASE_URL: postgresql://bhasha:bhasha@postgres:5432/bhashasetu
+      REDIS_URL: redis://redis:6379/0
+      # Peppers the recovery-phrase hash. Override in every real environment;
+      # rotating it invalidates every issued recovery phrase.
+      BHASHASETU_RECOVERY_PEPPER: dev-only-not-a-secret
+      # Stage 4 provider, unused until Phase 2. Kept here so the swap between
+      # Sarvam-30B and Qwen3-14B stays a one-line config change (spec §2).
+      LLM_PROVIDER: none
+      VLLM_BASE_URL: http://vllm:8000/v1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    command:
+      ["python", "-m", "uvicorn", "bhashasetu.api.app:app",
+       "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bhasha
+      POSTGRES_PASSWORD: bhasha
+      POSTGRES_DB: bhashasetu
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bhasha -d bhashasetu"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # --- Phase 2 -------------------------------------------------------------
+  # vllm:
+  #   image: vllm/vllm-openai:latest
+  #   command: >-
+  #     --model Qwen/Qwen3-14B --quantization awq
+  #     --max-model-len 8192 --enable-chunked-prefill
+  #   ports: ["8000:8000"]
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices: [{capabilities: [gpu]}]
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      # Server-side proxy target, so the browser only ever sees one origin and
+      # the httpOnly device cookie stays first-party.
+      BHASHASETU_API: http://backend:8000
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

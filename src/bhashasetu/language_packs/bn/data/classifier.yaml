@@ -1,0 +1,193 @@
+# পদাশ্রিত নির্দেশক ও বচন — classifier and number agreement.
+#
+# Three errors, all of them things careful Bengali writers still get wrong and
+# all of them decidable from closed lists:
+#
+#   1. double plural   সব ছাত্ররা      → সব ছাত্র
+#      A plural quantifier already carries the number. Adding -রা/-গুলো says it
+#      twice. (The other repair — dropping সব — is equally correct Bengali;
+#      the suggestion offers the one that keeps every word the writer typed.)
+#
+#   2. animacy, টি on a person    একটি নারী   → একজন নারী
+#   3. animacy, জন on a thing     তিনজন বই    → তিনটি বই
+#      -টি/-টা/-খানা count things, -জন counts people. This is the distinction
+#      the gold set spends ten cases on (cl-001…cl-012).
+#
+# PRECISION. The noun must appear in one of the two lists below — the rule never
+# guesses animacy from context. An unlisted noun is simply not checked, which is
+# a miss, and misses are what F0.5 forgives.
+
+# --- 1. double plural -----------------------------------------------------
+# Quantifiers that already mean "more than one".
+plural_quantifiers:
+  - "সব"
+  - "সকল"
+  - "সমস্ত"
+  - "অনেক"
+  - "বহু"
+  - "কয়েক"
+  - "নানা"
+  - "বিভিন্ন"
+  - "প্রতিটি"
+  - "প্রত্যেক"
+  - "কতিপয়"
+
+# Plural markers. -দের is absent on purpose: it is genitive/dative as well as
+# plural ("সব ছাত্রদের বই" is correct), and stripping it would break the case.
+plural_suffixes:
+  - "রা"
+  - "েরা"
+  - "গুলো"
+  - "গুলি"
+  - "গুলা"
+
+# How far after the quantifier the noun may sit. One slot for an adjective:
+# "সব ভালো ছাত্ররা".
+quantifier_window: 2
+
+# --- 2 & 3. animacy -------------------------------------------------------
+# Numeral + classifier, and what each becomes when the animacy is wrong. Only
+# the forms writers actually produce; নয়জন/নয়টি and up are rare enough to leave
+# to Phase 2.
+thing_to_person:
+  "একটি": "একজন"
+  "একটা": "একজন"
+  "একখানা": "একজন"
+  "একখানি": "একজন"
+  "দুটি": "দুজন"
+  "দুটো": "দুজন"
+  "দুইটি": "দুজন"
+  "দুইটা": "দুজন"
+  "দুইখানা": "দুজন"
+  "তিনটি": "তিনজন"
+  "তিনটে": "তিনজন"
+  "তিনটা": "তিনজন"
+  "চারটি": "চারজন"
+  "চারটে": "চারজন"
+  "চারটা": "চারজন"
+  "পাঁচটি": "পাঁচজন"
+  "পাঁচটা": "পাঁচজন"
+  "ছয়টি": "ছয়জন"
+  "সাতটি": "সাতজন"
+  "আটটি": "আটজন"
+  "দশটি": "দশজন"
+
+person_to_thing:
+  "একজন": "একটি"
+  "দুজন": "দুটি"
+  "দুইজন": "দুটি"
+  "তিনজন": "তিনটি"
+  "চারজন": "চারটি"
+  "পাঁচজন": "পাঁচটি"
+  "ছয়জন": "ছয়টি"
+  "সাতজন": "সাতটি"
+  "আটজন": "আটটি"
+  "দশজন": "দশটি"
+
+# How far after the numeral the head noun may sit — "একটি বিদুষী নারী" puts an
+# adjective in between.
+classifier_window: 3
+
+# Bare forms only. মেয়েদের is deliberately not matched by "মেয়ে": in
+# "একটি মেয়েদের কলেজ" the head noun is কলেজ, a thing, and একটি is correct.
+person_nouns:
+  - "নারী"
+  - "পুরুষ"
+  - "লোক"
+  - "মানুষ"
+  - "ছেলে"
+  - "মেয়ে"
+  - "ছাত্র"
+  - "ছাত্রী"
+  - "শিক্ষক"
+  - "শিক্ষিকা"
+  - "ডাক্তার"
+  - "নার্স"
+  - "কবি"
+  - "লেখক"
+  - "সদস্য"
+  - "বন্ধু"
+  - "ভাই"
+  - "বোন"
+  - "শ্রমিক"
+  - "কৃষক"
+  - "খেলোয়াড়"
+  - "অতিথি"
+  - "যাত্রী"
+  - "নেতা"
+  - "সৈনিক"
+  - "রোগী"
+  - "দর্শক"
+  - "পাঠক"
+  - "বক্তা"
+  - "সন্তান"
+
+thing_nouns:
+  - "বই"
+  - "কলম"
+  - "খাতা"
+  - "চেয়ার"
+  - "টেবিল"
+  - "ঘর"
+  - "বাড়ি"
+  - "গাছ"
+  - "ফুল"
+  - "ফল"
+  - "আম"
+  - "কলা"
+  - "গাড়ি"
+  - "চিঠি"
+  - "ছবি"
+  - "কাগজ"
+  - "জানালা"
+  - "দরজা"
+  - "পাথর"
+  - "নদী"
+  - "রাস্তা"
+  - "ব্যাগ"
+  - "জামা"
+  - "কম্পিউটার"
+  - "ফোন"
+  - "প্রশ্ন"
+
+# A bare জন after the numeral is part of the same error: "দশটি জন শ্রমিক" is one
+# mistake spelt across two words, and replacing only দশটি would leave "দশজন জন".
+# The span swallows it.
+absorbed_after_numeral: ["জন", "টি", "টা"]
+
+# The accusative -কে still marks the head noun, so বন্ধুকে counts as বন্ধু. The
+# genitive -দের/-ের does NOT: in "একটি মেয়েদের কলেজ" the head is কলেজ, and একটি
+# is correct.
+person_noun_case_suffixes: ["কে"]
+
+# --- 4. animate plural on an inanimate noun -------------------------------
+# -রা is the animate plural. Things take -গুলো: বইরা → বইগুলো. Filed as
+# AGREEMENT rather than CLASSIFIER to match the gold set (ag-011…ag-014), which
+# is also the more natural reading — the error is number/animacy concord, not a
+# wrong নির্দেশক.
+inanimate_plural: "গুলো"
+
+# --- 5. possessive that disagrees with a plural subject -------------------
+# "আমরা আমার কাজ শেষ করেছি" — the subject is plural, so the possessive must be
+# too. Restricted to same-person pairs: "আমরা তোমার বই এনেছি" is perfectly good
+# Bengali and must never be touched.
+possessive_for_plural_subject:
+  আমরা: { আমার: "আমাদের" }
+  তারা: { তার: "তাদের" }
+  তাহারা: { তাহার: "তাহাদের" }
+  তোমরা: { তোমার: "তোমাদের" }
+  ওরা: { তার: "তাদের" }
+  এরা: { তার: "তাদের" }
+
+# Plural nouns (ছেলেরা, শ্রমিকেরা) take the same third-person correction.
+plural_noun_possessive:
+  তার: "তাদের"
+
+detection:
+  # Below the ণত্ব list and the পুরুষ rule: animacy is decided from a word list
+  # rather than from the sentence, and a metaphor or a personification can make
+  # a listed noun behave like the other kind.
+  confidence: 0.8
+  double_plural_confidence: 0.84
+  inanimate_plural_confidence: 0.82
+  possessive_confidence: 0.82

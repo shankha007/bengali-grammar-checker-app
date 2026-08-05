@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # Pinned to the spec'd version so local 3.13 development cannot
+          # silently depend on something 3.12 lacks.
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check src tests scripts
+
+      - name: Core language purity (spec §7)
+        run: python scripts/lint_core_language_purity.py
+
+      - name: Data normalization (composed nukta forms)
+        # Byte-level check. `ড + ়` and `ড়` are indistinguishable on screen and
+        # unequal as strings; a decomposed data file silently disables lexicon
+        # lookups. Not catchable by code review.
+        run: python scripts/lint_data_normalization.py
+
+      - name: Typecheck
+        run: mypy
+
+      - name: Tests
+        run: pytest -q
+
+      - name: Gold set structural checks
+        run: python scripts/validate_gold.py
+
+      - name: Evaluation harness + regression gate (spec §8)
+        # Fails on: clean-text FP rate above 3%, or any error class losing more
+        # than 2 F0.5 points against eval/baseline.json.
+        run: python -m bhashasetu.cli eval
+
+      # Enable once the gold set reaches 600 human-verified sentences. Until
+      # then this would fail every build, which trains people to ignore it.
+      # - name: Gold-set completeness gate
+      #   run: python -m bhashasetu.cli eval --strict

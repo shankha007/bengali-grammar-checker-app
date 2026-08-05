@@ -1,0 +1,75 @@
+# Bijoy / SutonnyMJ glyph map.
+#
+# STATUS: PARTIAL AND INERT. Only entries verified against known word pairs are
+# listed. `bijoy.convert_bijoy()` refuses to convert unless it can cover >=95% of
+# the input, so this file being incomplete means "detected, not converted" - it
+# can never mean "converted wrongly".
+#
+# Completing it is a Phase 4 task (spec §6.2 schedules the Bijoy converter
+# there) and must land with its own round-trip gold set: for N known
+# Bijoy/Unicode document pairs, convert(bijoy) == unicode, character for
+# character. Do not extend this table from memory or from a blog post; use a
+# SutonnyMJ keymap plus paired documents.
+#
+# Verified from: Avwg = আমি, evsjv = বাংলা, Zzwg = তুমি
+
+map:
+  "A": "আ"
+  "v": "া"
+  "w": "ি"
+  "z": "ু"
+  "g": "ম"
+  "e": "ব"
+  "s": "ং"
+  "j": "ল"
+  "Z": "ত"
+
+# High-range Windows-1252 code points that appear constantly in Bijoy text and
+# essentially never in English prose. Detection leans on these, so it stays
+# reliable even while `map` is incomplete.
+signature:
+  - "‡"
+  - "†"
+  - "Ò"
+  - "Ó"
+  - "¸"
+  - "¯"
+  - "‹"
+  - "›"
+  - "„"
+  - "‰"
+  - "Œ"
+  - "˜"
+  - "™"
+  - "š"
+  - "œ"
+  - "ž"
+  - "Ÿ"
+  - "¡"
+  - "¢"
+  - "£"
+  - "¤"
+  - "¥"
+  - "¦"
+  - "§"
+  - "¨"
+  - "©"
+  - "ª"
+  - "«"
+  - "¬"
+  - "®"
+  - "°"
+  - "±"
+  - "²"
+  - "³"
+  - "´"
+  - "µ"
+  - "¶"
+  - "·"
+  - "¹"
+  - "º"
+  - "»"
+  - "¼"
+  - "½"
+  - "¾"
+  - "¿"

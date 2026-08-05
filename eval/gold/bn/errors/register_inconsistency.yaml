@@ -1,0 +1,90 @@
+# REGISTER_INCONSISTENCY — রীতির অসঙ্গতি
+#
+# Document-level drift between সাধু and চলিত. Distinct from GURUCHANDALI_DOSHA,
+# which is a clash WITHIN one sentence.
+#
+# The distinction matters because a text that quotes an archaic letter, or a
+# novel whose narration is চলিত and whose dialogue is সাধু, is not making an
+# error. So the detector requires a minimum document length (4 labelled
+# sentences) and a minority share above 15% before it will say anything, and it
+# fires once per document rather than once per sentence.
+#
+# Cases here are multi-sentence by construction. `wrong` is omitted: the error
+# is a property of the document, not of a span, so any REGISTER_INCONSISTENCY
+# edit on the text counts as a hit.
+#
+# review: model — see eval/gold/README.md.
+
+cases:
+  - id: ri-001
+    text: "তিনি আসিলেন। তারপর সে চলে গেছে। আমরা বসিয়া রহিলাম। এখন বাড়ি যাচ্ছি। সে বলল যে দেরি হয়েছে।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-002
+    text: "আমি করিয়াছি। তুমি করেছ। সে করিতেছে। আমরা করছি। তারা করল।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-003
+    text: "সে বলিল। আমি বললাম। তিনি কহিলেন। তারা বলল। আমরা বলিয়াছি।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-004
+    text: "বালকটি বিদ্যালয়ে গিয়াছিল। সেখানে সে বন্ধুদের সঙ্গে দেখা করেছে। শিক্ষক তাহাকে ডাকিলেন। ছেলেটি ভয় পেয়ে গেল। পরে সব ঠিক হইল।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-005
+    text: "সকালে সূর্য উঠিল। পাখিরা গান গাইছে। কৃষক মাঠে গিয়াছে। শিশুরা খেলছে। দিনটি সুন্দর হইল।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-006
+    text: "তিনি একটি পুস্তক লিখিয়াছেন। বইটি খুব জনপ্রিয় হয়েছে। পাঠকেরা ইহা পছন্দ করিয়াছে। সমালোচকরাও প্রশংসা করছে। লেখক সন্তুষ্ট হইলেন।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-007
+    text: "আমরা গ্রামে গিয়াছিলাম। সেখানে অনেক গাছ দেখেছি। নদীর জল স্বচ্ছ ছিল। আমরা সাঁতার কাটিয়াছি। সন্ধ্যায় ফিরে এসেছি।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-008
+    text: "রাজা সিংহাসনে বসিলেন। মন্ত্রীরা তাঁকে অভিবাদন জানাল। সভা শুরু হইল। সবাই মনোযোগ দিয়ে শুনছে। আলোচনা দীর্ঘ হইল।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-009
+    text: "মেয়েটি স্কুল থেকে ফিরিয়াছে। সে খুব ক্লান্ত হয়েছে। মা তাহাকে খাবার দিলেন। সে খেয়ে ঘুমিয়ে পড়েছে। সন্ধ্যায় সে উঠিল।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-010
+    text: "বৃষ্টি নামিল। রাস্তা ভিজে গেছে। লোকজন ছাতা খুলিয়াছে। যানজট তৈরি হয়েছে। সবাই বিরক্ত হইল।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-011
+    text: "তিনি সভায় আসিয়াছিলেন। সবাই তাঁকে স্বাগত জানিয়েছে। তিনি বক্তৃতা দিলেন। শ্রোতারা মন দিয়ে শুনছে। অনুষ্ঠান শেষ হইল।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ri-012
+    text: "ছেলেটি বই পড়িতেছে। তার বোন গান গাইছে। মা রান্না করিতেছেন। বাবা অফিস থেকে ফিরেছেন। সন্ধ্যা হইয়াছে।"
+    error_class: REGISTER_INCONSISTENCY
+    review: human
+    reviewed_by: project-owner
+    source: model-authored

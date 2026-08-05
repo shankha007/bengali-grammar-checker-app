@@ -1,0 +1,193 @@
+# WORD_ORDER — পদক্রম-ভ্রম
+#
+# Bengali is SOV and comparatively free, which is exactly what makes this class
+# treacherous: most reorderings are grammatical, merely marked or emphatic. Only
+# genuinely ungrammatical orders belong here.
+#
+# The reliable constraints — the ones these cases are built on:
+#
+#   * the negator না follows the finite verb (আমি যাব না, never না আমি যাব)
+#   * a genitive precedes its head noun (আমার বই, never বই আমার as a statement)
+#   * an adjective precedes its noun (ভালো ছেলে, never ছেলে ভালো attributively)
+#   * a classifier-number phrase precedes its noun (তিনটি বই)
+#   * postpositions follow their complement (টেবিলের উপরে)
+#
+# `right` here is a full corrected sentence rather than a single token, because
+# a reordering has no single replacement span. The span in `wrong` marks where
+# the problem is first visible.
+#
+# No detector until Phase 2. review: model — see eval/gold/README.md.
+
+cases:
+  # --- negator placement
+  - id: wo-001
+    text: "না আমি কখনো ভাত খাই।"
+    error_class: WORD_ORDER
+    wrong: "না আমি"
+    right: "আমি কখনো ভাত খাই না।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-002
+    text: "সে না যাবে সেখানে।"
+    error_class: WORD_ORDER
+    wrong: "না যাবে"
+    right: "সে সেখানে যাবে না।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-003
+    text: "আমি না জানি এ বিষয়ে কিছু।"
+    error_class: WORD_ORDER
+    wrong: "না জানি"
+    right: "আমি এ বিষয়ে কিছু জানি না।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-004
+    text: "তারা না এসেছে আজ।"
+    error_class: WORD_ORDER
+    wrong: "না এসেছে"
+    right: "তারা আজ আসেনি।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- genitive after its head
+  - id: wo-005
+    text: "বই আমার টেবিলে রাখা আছে।"
+    error_class: WORD_ORDER
+    wrong: "বই আমার"
+    right: "আমার বই টেবিলে রাখা আছে।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-006
+    text: "বাড়ি তার খুব সুন্দর।"
+    error_class: WORD_ORDER
+    wrong: "বাড়ি তার"
+    right: "তার বাড়ি খুব সুন্দর।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-007
+    text: "নাম তোমার কী?"
+    error_class: WORD_ORDER
+    wrong: "নাম তোমার"
+    right: "তোমার নাম কী?"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- adjective after its noun in attributive position
+  - id: wo-008
+    text: "খুব সে ভালো ছাত্র একজন।"
+    error_class: WORD_ORDER
+    wrong: "খুব সে"
+    right: "সে খুব ভালো একজন ছাত্র।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-009
+    text: "ছেলে ভালো একটি এসেছে।"
+    error_class: WORD_ORDER
+    wrong: "ছেলে ভালো"
+    right: "একটি ভালো ছেলে এসেছে।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-010
+    text: "ফুল সুন্দর বাগানে ফুটেছে।"
+    error_class: WORD_ORDER
+    wrong: "ফুল সুন্দর"
+    right: "বাগানে সুন্দর ফুল ফুটেছে।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- classifier phrase after its noun
+  - id: wo-011
+    text: "বই তিনটি টেবিলে আছে বলে আমি জানি।"
+    error_class: WORD_ORDER
+    wrong: "বই তিনটি"
+    right: "তিনটি বই টেবিলে আছে বলে আমি জানি।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+    note: "বই তিনটি is acceptable as a definite phrase; reviewer should confirm"
+  - id: wo-012
+    text: "ছাত্র দুজন ক্লাসে ঢুকল দেরিতে।"
+    error_class: WORD_ORDER
+    wrong: "ছাত্র দুজন"
+    right: "দুজন ছাত্র দেরিতে ক্লাসে ঢুকল।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- postposition before its complement
+  - id: wo-013
+    text: "উপরে টেবিলের বইটি রাখা আছে।"
+    error_class: WORD_ORDER
+    wrong: "উপরে টেবিলের"
+    right: "টেবিলের উপরে বইটি রাখা আছে।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-014
+    text: "সঙ্গে আমার সে এসেছিল।"
+    error_class: WORD_ORDER
+    wrong: "সঙ্গে আমার"
+    right: "সে আমার সঙ্গে এসেছিল।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-015
+    text: "থেকে ঢাকা সে গতকাল এসেছে।"
+    error_class: WORD_ORDER
+    wrong: "থেকে ঢাকা"
+    right: "সে গতকাল ঢাকা থেকে এসেছে।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-016
+    text: "ভিতরে ঘরের কেউ নেই।"
+    error_class: WORD_ORDER
+    wrong: "ভিতরে ঘরের"
+    right: "ঘরের ভিতরে কেউ নেই।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- finite verb stranded before its object
+  - id: wo-017
+    text: "আমি পড়েছি বইটি খুব মন দিয়ে গতকাল রাতে।"
+    error_class: WORD_ORDER
+    wrong: "পড়েছি বইটি"
+    right: "আমি গতকাল রাতে বইটি খুব মন দিয়ে পড়েছি।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-018
+    text: "সে খেয়েছে ভাত দুপুরে।"
+    error_class: WORD_ORDER
+    wrong: "খেয়েছে ভাত"
+    right: "সে দুপুরে ভাত খেয়েছে।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-019
+    text: "তিনি লিখেছেন একটি বই সম্প্রতি।"
+    error_class: WORD_ORDER
+    wrong: "লিখেছেন একটি"
+    right: "তিনি সম্প্রতি একটি বই লিখেছেন।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: wo-020
+    text: "আমরা দেখেছি ছবিটি গতকাল সিনেমা হলে।"
+    error_class: WORD_ORDER
+    wrong: "দেখেছি ছবিটি"
+    right: "আমরা গতকাল সিনেমা হলে ছবিটি দেখেছি।"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored

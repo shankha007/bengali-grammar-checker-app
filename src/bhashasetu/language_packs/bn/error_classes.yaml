@@ -1,0 +1,166 @@
+# The 12 error classes for Bengali (spec §3).
+#
+# Loader contract (core/error_classes.py): every one of the 12 must be present,
+# each needs a Bengali explanation, an English gloss, and at least 3 gold cases -
+# load fails otherwise. An error class nobody can test is not shippable.
+#
+# `{wrong}` / `{right}` / `{register}` / `{ratio}` are substituted at render time.
+# `implemented_at_stage` is the truth about what runs TODAY; `null` means the
+# class is declared and evaluated but has no detector yet, so `make eval` reports
+# it as 0.0 recall rather than omitting the row.
+
+error_classes:
+
+  NON_WORD:
+    label_native: "অভিধান-বহির্ভূত শব্দ"
+    label_en: "Non-word spelling error"
+    explanation_native: "“{wrong}” শব্দটি অভিধানে পাওয়া যায়নি। সম্ভাব্য বানান: “{right}”।"
+    explanation_en: "“{wrong}” is not in the lexicon. Did you mean “{right}”?"
+    # The suggester finds nothing for a proper noun, and it is switched off
+    # entirely past the per-request budget. Without these, both cases rendered
+    # `সম্ভাব্য বানান: “”।` — an empty suggestion presented as a suggestion.
+    explanation_native_no_fix: "“{wrong}” শব্দটি অভিধানে পাওয়া যায়নি। কাছাকাছি কোনো বানান পাওয়া যায়নি — নামবাচক শব্দ হলে অগ্রাহ্য করুন।"
+    explanation_en_no_fix: "“{wrong}” is not in the lexicon, and nothing close was found. Ignore this if it is a proper noun."
+    rule_reference: "বাংলা একাডেমি প্রমিত বানানরীতি"
+    implemented_at_stage: 1
+    gold_cases:
+      - "আমি বাংলা ভাসায় কথা বলি।"
+      - "সে স্কুলে যাচ্ছিল কিন্তু বিষটি ভুলে গেল।"
+      - "তিনি একজন বিখ্যত লেখক।"
+
+  HOMONYM:
+    label_native: "সমোচ্চারিত ভিন্নার্থক শব্দ"
+    label_en: "Real-word (homonym) error"
+    explanation_native: "এখানে “{wrong}” নয়, “{right}” হবে — দুটি শব্দের উচ্চারণ এক হলেও অর্থ আলাদা।"
+    explanation_en: "“{right}” is meant here, not “{wrong}”; the two sound alike but differ in meaning."
+    rule_reference: "সমোচ্চারিত ভিন্নার্থক শব্দ"
+    implemented_at_stage: 1
+    gold_cases:
+      - "আমি আসা করি তুমি আসবে।"
+      - "সে দিন-দুঃখী মানুষের পাশে দাঁড়াল।"
+      - "নদীর কুলে বসে আছি।"
+
+  NOTVA_SHOTVA:
+    label_native: "ণত্ব ও ষত্ব বিধান"
+    label_en: "ণত্ব / ষত্ব rule violation"
+    explanation_native: "তৎসম শব্দে “{wrong}” নয়, “{right}” হবে — {rule} অনুসারে।"
+    explanation_en: "In this তৎসম word the correct form is “{right}”, not “{wrong}”."
+    rule_reference: "ণত্ব-বিধান / ষত্ব-বিধান"
+    implemented_at_stage: 1
+    gold_cases:
+      - "এর কারন কী?"
+      - "সে ঘন্টা খানেক অপেক্ষা করল।"
+      - "বৃস্টি নামল সন্ধ্যায়।"
+
+  CASE_MARKER:
+    label_native: "বিভক্তি-ভ্রম"
+    label_en: "Case-marker error"
+    explanation_native: "এখানে “{wrong}” বিভক্তি নয়, “{right}” বিভক্তি প্রযোজ্য।"
+    explanation_en: "This slot takes “{right}”, not “{wrong}”."
+    rule_reference: "কারক ও বিভক্তি"
+    implemented_at_stage: null   # Stage 2, Phase 2
+    gold_cases:
+      - "আমি তাকে বইটা দিলাম।"
+      - "সে স্কুলকে যায়।"
+      - "ছেলেটি মাঠে খেলছে।"
+
+  CLASSIFIER:
+    label_native: "নির্ধারক / পদাশ্রিত নির্দেশক"
+    label_en: "Classifier agreement error"
+    explanation_native: "সংখ্যা ও প্রাণিবাচকতা অনুসারে এখানে “{right}” নির্দেশক হবে, “{wrong}” নয়।"
+    explanation_en: "Number and animacy require “{right}” here, not “{wrong}”."
+    rule_reference: "পদাশ্রিত নির্দেশক (টা/টি/খানা/গুলো)"
+    implemented_at_stage: 1
+    gold_cases:
+      - "তিনটা বই টেবিলে আছে।"
+      - "লোকগুলি চলে গেল।"
+      - "একখানা চিঠি এল।"
+
+  VERB_INFLECTION:
+    label_native: "ক্রিয়ার রূপভ্রম"
+    label_en: "Verb inflection error"
+    explanation_native: "কর্তার পুরুষ ও সম্ভ্রম অনুসারে ক্রিয়াপদ “{right}” হবে।"
+    explanation_en: "The verb must agree with the subject's person and honorific level: “{right}”."
+    rule_reference: "পুরুষ ও সম্ভ্রমভেদে ক্রিয়ার রূপ"
+    implemented_at_stage: 1
+    gold_cases:
+      - "আপনি কোথায় যাচ্ছ?"
+      - "তুই কোথায় যাচ্ছেন?"
+      - "তিনি বাড়ি গেল।"
+
+  WORD_ORDER:
+    label_native: "পদক্রম-ভ্রম"
+    label_en: "Word order error"
+    explanation_native: "বাংলা পদক্রম মুক্ত হলেও এই বিন্যাসটি ব্যাকরণসম্মত নয়।"
+    explanation_en: "Bengali word order is free, but this particular ordering is ungrammatical."
+    rule_reference: "পদক্রম"
+    implemented_at_stage: null
+    gold_cases:
+      - "আমি ভাত খাই না কখনো।"
+      - "বইটি পড়েছি আমি।"
+      - "সে খুব ভালো একজন ছাত্র।"
+
+  POS_ERROR:
+    label_native: "পদ-ভ্রম"
+    label_en: "Part-of-speech error"
+    explanation_native: "এই স্থানে “{wrong}” পদটি মানানসই নয়; “{right}” হওয়া উচিত।"
+    explanation_en: "“{wrong}” is the wrong part of speech for this slot; use “{right}”."
+    rule_reference: "পদ-প্রকরণ"
+    implemented_at_stage: null
+    gold_cases:
+      - "তার সুন্দর গান করে।"
+      - "সে দ্রুততা দৌড়াল।"
+      - "আমার খুশি লাগছে।"
+
+  AGREEMENT:
+    label_native: "অন্বয়-ভ্রম"
+    label_en: "Agreement error"
+    explanation_native: "বচন ও প্রাণিবাচকতার অন্বয় ঠিক হয়নি।"
+    explanation_en: "Number/animacy agreement is broken here."
+    rule_reference: "অন্বয়"
+    implemented_at_stage: 1
+    gold_cases:
+      - "ছেলেরা যাচ্ছে।"
+      - "অনেক বই আছেন।"
+      - "গাছগুলো বড় হয়েছেন।"
+
+  GURUCHANDALI_DOSHA:
+    label_native: "গুরুচণ্ডালী দোষ"
+    label_en: "সাধু / চলিত register mixing"
+    explanation_native: "একই বাক্যে সাধু ও চলিত রীতি মেশানো হয়েছে। {register} রীতিতে “{right}” লিখুন।"
+    explanation_en: "সাধু and চলিত forms are mixed in one sentence. Use “{right}” to stay in {register}."
+    # A সাধু form built on a productive ending may have no চলিত
+    # counterpart the pack can derive. Naming the offending word and the
+    # register it belongs to beats quoting a correction that does not exist.
+    explanation_native_no_fix: "একই বাক্যে সাধু ও চলিত রীতি মেশানো হয়েছে — “{wrong}” এখানে বেমানান। গোটা বাক্য {register} রীতিতে লিখুন।"
+    explanation_en_no_fix: "সাধু and চলিত forms are mixed in one sentence — “{wrong}” is the odd one out. Write the whole sentence in {register}."
+    rule_reference: "গুরুচণ্ডালী দোষ"
+    implemented_at_stage: 1
+    gold_cases:
+      - "তিনি বাজারে গিয়া দুইটা আম কিনলেন।"
+      - "সে তাহার বইটা পড়ছে।"
+      - "আমরা করিয়াছি এবং এখন যাচ্ছি।"
+
+  REGISTER_INCONSISTENCY:
+    label_native: "রীতির অসঙ্গতি"
+    label_en: "Document-level register drift"
+    explanation_native: "সমগ্র লেখায় রীতির অসঙ্গতি রয়েছে ({ratio} বাক্য ভিন্ন রীতিতে)। {register} রীতিতে একরূপ করুন।"
+    explanation_en: "Register drifts across the document ({ratio} of sentences differ). Settle on {register}."
+    rule_reference: "রচনারীতির একরূপতা"
+    implemented_at_stage: 1
+    gold_cases:
+      - "তিনি আসিলেন। তারপর সে চলে গেল। আমরা বসিয়া রহিলাম। এখন বাড়ি যাচ্ছি।"
+      - "আমি করিয়াছি। তুমি করেছ। সে করিয়াছে। আমরা করছি।"
+      - "সে বলিল। আমি বললাম। তিনি কহিলেন। তারা বলল।"
+
+  PUNCTUATION:
+    label_native: "যতিচিহ্নের ভুল"
+    label_en: "Punctuation error"
+    explanation_native: "যতিচিহ্নের ব্যবহারে ভুল: “{wrong}” নয়, “{right}” হবে।"
+    explanation_en: "Punctuation problem: use “{right}” rather than “{wrong}”."
+    rule_reference: "যতিচিহ্ন ব্যবহারবিধি"
+    implemented_at_stage: 1
+    gold_cases:
+      - "আমি বাড়ি যাচ্ছি ।"
+      - "সে এসেছে."
+      - "তুমি কি আসবে??"

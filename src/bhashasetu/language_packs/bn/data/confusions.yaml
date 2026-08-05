@@ -1,0 +1,108 @@
+# HOMONYM / real-word errors.
+#
+# Honest statement of Phase 1 capability: this class is near-unsolvable without
+# sentence context, which is precisely why the spec's cited research puts LLM
+# performance below 20% here and assigns detection to a fine-tuned encoder.
+# Stage 1 sees a word that is spelt correctly and is in the dictionary. It has no
+# basis to object.
+#
+# So Phase 1 ships two things and no more:
+#
+#   1. `pairs`  - the confusion inventory, with glosses. Not a detector. This is
+#                 training/eval data for the Stage 2 BanglaBERT head (Phase 2)
+#                 and the source of the HOMONYM gold slice.
+#   2. `collocations` - a small set of bigram rules where the context is
+#                 unambiguous enough to fire at Stage 1 with high precision.
+#                 Recall here is intentionally almost zero. Every entry must be
+#                 a case where the alternative reading is not merely unlikely but
+#                 ungrammatical.
+
+pairs:
+  - words: ["দিন", "দীন"]
+    gloss_bn: ["দিন = day / দাও", "দীন = দরিদ্র, নম্র"]
+    gloss_en: ["day; also imperative 'give'", "poor, humble"]
+  - words: ["কর", "কড়"]
+    gloss_bn: ["কর = হাত, খাজনা, করো", "কড় = কড়া/আঙুলের গাঁট"]
+    gloss_en: ["hand; tax; do", "knuckle"]
+  - words: ["জল", "জ্বল"]
+    gloss_bn: ["জল = পানি", "জ্বল = জ্বলার ক্রিয়া"]
+    gloss_en: ["water", "burn (verb stem)"]
+  - words: ["বাড়ি", "বারি"]
+    gloss_bn: ["বাড়ি = গৃহ", "বারি = জল (তৎসম)"]
+    gloss_en: ["house", "water (Sanskritic)"]
+  - words: ["কূল", "কুল"]
+    gloss_bn: ["কূল = তীর", "কুল = বংশ; বরই"]
+    gloss_en: ["riverbank", "lineage; jujube"]
+  - words: ["শ্বাস", "সাশ"]
+    gloss_bn: ["শ্বাস = নিঃশ্বাস", "সাশ = ভুল বানান"]
+    gloss_en: ["breath", "misspelling"]
+  - words: ["নীল", "নিল"]
+    gloss_bn: ["নীল = রং", "নিল = নেওয়ার অতীত"]
+    gloss_en: ["blue", "took"]
+  - words: ["আশা", "আসা"]
+    gloss_bn: ["আশা = প্রত্যাশা", "আসা = আগমন"]
+    gloss_en: ["hope", "coming"]
+  - words: ["অন্ন", "অন্য"]
+    gloss_bn: ["অন্ন = খাদ্য", "অন্য = ভিন্ন"]
+    gloss_en: ["food", "other"]
+  - words: ["কাল", "কালো"]
+    gloss_bn: ["কাল = সময়; আগামীকাল", "কালো = কৃষ্ণবর্ণ"]
+    gloss_en: ["time; tomorrow/yesterday", "black"]
+  - words: ["পথ", "পাথ"]
+    gloss_bn: ["পথ = রাস্তা", "পাথ = ভুল বানান"]
+    gloss_en: ["path", "misspelling"]
+  - words: ["মন্ত্র", "মন্ত্রী"]
+    gloss_bn: ["মন্ত্র = বাণী", "মন্ত্রী = মিনিস্টার"]
+    gloss_en: ["incantation", "minister"]
+
+# Bigram rules. `before`/`after` are matched against adjacent word tokens.
+# Confidence stays modest even here; these surface as suggestions, never as
+# auto-fixes.
+collocations:
+  - wrong: "দিন"
+    right: "দীন"
+    after: ["দুঃখী", "দরিদ্র"]
+    confidence: 0.62
+    note: "দীন-দুঃখী is a fixed compound; দিন-দুঃখী is not Bengali"
+  - wrong: "আসা"
+    right: "আশা"
+    before: ["করি", "করছি", "করেন", "রাখি"]
+    confidence: 0.66
+    note: "আশা করি = I hope; আসা করি is ungrammatical"
+  - wrong: "কূল"
+    right: "কুল"
+    before: ["গোত্র"]
+    confidence: 0.6
+
+  # পড়া (to read / to fall) vs পরা (to wear). Both are real words and both are
+  # extremely common, so this is decidable only from what is being worn — hence
+  # a closed list of garments rather than a rule. "বই পড়ে" must stay untouched,
+  # which is the whole reason this is a bigram and not a word swap.
+  - wrong: "পড়ে"
+    right: "পরে"
+    after: ["শাড়ি", "শারি", "জামা", "পোশাক", "জুতা", "জুতো", "চশমা", "ঘড়ি", "টুপি",
+            "পাঞ্জাবি", "ওড়না", "শার্ট", "গয়না"]
+    confidence: 0.72
+    note: >-
+      শাড়ি পরে = wearing a saree; শাড়ি পড়ে would be reading one.
+      শারি is in the trigger list too: a writer who mis-spells the garment still
+      mis-uses the verb, and each edit has to stand on its own rather than wait
+      for the other to be accepted first.
+  - wrong: "পড়ব"
+    right: "পরব"
+    after: ["শাড়ি", "শারি", "জামা", "পোশাক", "জুতা", "পাঞ্জাবি", "ওড়না"]
+    confidence: 0.7
+  - wrong: "পড়েছি"
+    right: "পরেছি"
+    after: ["শাড়ি", "শারি", "জামা", "পোশাক", "জুতা", "পাঞ্জাবি", "ওড়না"]
+    confidence: 0.7
+
+  # শারি is a real word — a row, or a caged bird — which is why this is a
+  # bigram and why bn_BD accepts it. Next to a verb of wearing it is শাড়ি, and
+  # that spelling was itself missing from the dictionary until this was found;
+  # see the note in extra_words.txt.
+  - wrong: "শারি"
+    right: "শাড়ি"
+    before: ["পরে", "পড়ে", "পরি", "পরব", "পড়ব", "পরেছি", "পরেন", "পরল"]
+    confidence: 0.74
+    note: "শারি = a row / a myna; the garment is শাড়ি"

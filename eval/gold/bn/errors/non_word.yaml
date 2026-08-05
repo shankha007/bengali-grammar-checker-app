@@ -1,0 +1,418 @@
+# NON_WORD — অভিধান-বহির্ভূত শব্দ
+#
+# A token that is not a word in any reading. Distinct from HOMONYM, where the
+# token IS a word but the wrong one — if the erroneous form is spellable and
+# meaningful, it belongs in homonym.yaml, not here.
+#
+# review: model — authored and cross-checked by the implementing agent against
+# the bn_BD dictionary, not signed off by a Bengali-literate reviewer. See
+# eval/gold/README.md before quoting any number computed from this file.
+
+cases:
+  - id: nw-001
+    text: "তিনি একজন বিখ্যত লেখক।"
+    error_class: NON_WORD
+    wrong: "বিখ্যত"
+    right: "বিখ্যাত"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-002
+    text: "সে প্রতিদিন সকালে বেয়াম করে।"
+    error_class: NON_WORD
+    wrong: "বেয়াম"
+    right: "ব্যায়াম"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-003
+    text: "আমাদের গ্রন্থাগারে অনেক পুস্তোক আছে।"
+    error_class: NON_WORD
+    wrong: "পুস্তোক"
+    right: "পুস্তক"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-004
+    text: "শিক্ষক ছাত্রদের অংকো শেখাচ্ছেন।"
+    error_class: NON_WORD
+    wrong: "অংকো"
+    right: "অঙ্ক"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-005
+    text: "তার আচরন খুবই অদ্ভূত।"
+    error_class: NON_WORD
+    wrong: "অদ্ভূত"
+    right: "অদ্ভুত"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-006
+    text: "এই সমশ্যার সমাধান জরুরি।"
+    error_class: NON_WORD
+    wrong: "সমশ্যার"
+    right: "সমস্যার"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-007
+    text: "সে বিশ্ববিদ্যালয়ে ভর্তী হয়েছে।"
+    error_class: NON_WORD
+    wrong: "ভর্তী"
+    right: "ভর্তি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-008
+    text: "আমরা সবাই স্বাধীনতার ইতিহাষ জানি।"
+    error_class: NON_WORD
+    wrong: "ইতিহাষ"
+    right: "ইতিহাস"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-009
+    text: "তিনি একজন দক্ষ প্রকৌশলি।"
+    error_class: NON_WORD
+    wrong: "প্রকৌশলি"
+    right: "প্রকৌশলী"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-010
+    text: "শীতকালে অনেক পরিযায়ি পাখি আসে।"
+    error_class: NON_WORD
+    wrong: "পরিযায়ি"
+    right: "পরিযায়ী"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-011
+    text: "তার ব্যবহারে আমি খুব আশ্চর্য্য হলাম।"
+    error_class: NON_WORD
+    wrong: "আশ্চর্য্য"
+    right: "আশ্চর্য"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-012
+    text: "সে সবসময় সত্যি কথা বলার চেষ্ঠা করে।"
+    error_class: NON_WORD
+    wrong: "চেষ্ঠা"
+    right: "চেষ্টা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-013
+    text: "এই বইটি অত্যন্ত গুরুত্বপুর্ণ।"
+    error_class: NON_WORD
+    wrong: "গুরুত্বপুর্ণ"
+    right: "গুরুত্বপূর্ণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-014
+    text: "তিনি সভায় গুরুত্বপূর্ণ বক্ত্যব্য দিলেন।"
+    error_class: NON_WORD
+    wrong: "বক্ত্যব্য"
+    right: "বক্তব্য"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-015
+    text: "আমার বন্ধুটি খুব পরিশ্রমি।"
+    error_class: NON_WORD
+    wrong: "পরিশ্রমি"
+    right: "পরিশ্রমী"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-016
+    text: "নদীর স্রোত খুব প্রখড়।"
+    error_class: NON_WORD
+    wrong: "প্রখড়"
+    right: "প্রখর"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-017
+    text: "সে সবার কাছে ক্ষমা প্রার্থণা করল।"
+    error_class: NON_WORD
+    wrong: "প্রার্থণা"
+    right: "প্রার্থনা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-018
+    text: "এই ঘটনার পুনরাবৃত্তী যেন না হয়।"
+    error_class: NON_WORD
+    wrong: "পুনরাবৃত্তী"
+    right: "পুনরাবৃত্তি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-019
+    text: "তার মধ্যে অসাধারন প্রতিভা রয়েছে।"
+    error_class: NON_WORD
+    wrong: "অসাধারন"
+    right: "অসাধারণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+    note: "also a ণত্ব violation; classified NON_WORD because the form is not a word at all"
+  - id: nw-020
+    text: "আমরা অনুষ্ঠানে উপস্থীত ছিলাম।"
+    error_class: NON_WORD
+    wrong: "উপস্থীত"
+    right: "উপস্থিত"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-021
+    text: "তিনি দীর্ঘদিন বিদেশে অবস্থাণ করেছেন।"
+    error_class: NON_WORD
+    wrong: "অবস্থাণ"
+    right: "অবস্থান"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-022
+    text: "শিশুটির মুখে মিষ্টি হাষি ফুটল।"
+    error_class: NON_WORD
+    wrong: "হাষি"
+    right: "হাসি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-023
+    text: "এই কাজে অনেক ধর্য্য লাগে।"
+    error_class: NON_WORD
+    wrong: "ধর্য্য"
+    right: "ধৈর্য"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-024
+    text: "তার লেখায় গভিরতা আছে।"
+    error_class: NON_WORD
+    wrong: "গভিরতা"
+    right: "গভীরতা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-025
+    text: "সে বাজার থেকে সব্জি কিনে এনেছে।"
+    error_class: NON_WORD
+    wrong: "সব্জি"
+    right: "সবজি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-026
+    text: "আমরা তার সিদ্ধান্তে সন্তুষ্ঠ নই।"
+    error_class: NON_WORD
+    wrong: "সন্তুষ্ঠ"
+    right: "সন্তুষ্ট"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-027
+    text: "এই এলাকার জনসংক্ষা দ্রুত বাড়ছে।"
+    error_class: NON_WORD
+    wrong: "জনসংক্ষা"
+    right: "জনসংখ্যা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-028
+    text: "তিনি একজন বিশিষ্ঠ সমাজসেবক।"
+    error_class: NON_WORD
+    wrong: "বিশিষ্ঠ"
+    right: "বিশিষ্ট"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-029
+    text: "ছেলেটি খুব বুদ্ধিমাণ।"
+    error_class: NON_WORD
+    wrong: "বুদ্ধিমাণ"
+    right: "বুদ্ধিমান"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-030
+    text: "আকাশে পুর্ণিমার চাঁদ উঠেছে।"
+    error_class: NON_WORD
+    wrong: "পুর্ণিমার"
+    right: "পূর্ণিমার"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-031
+    text: "তার কথায় আমি বিশ্বস করলাম।"
+    error_class: NON_WORD
+    wrong: "বিশ্বস"
+    right: "বিশ্বাস"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-032
+    text: "এই প্রকল্পের বাজেট অপ্রতুল বলে মনে হচ্ছে না, বরং অতিরিক্ত্য।"
+    error_class: NON_WORD
+    wrong: "অতিরিক্ত্য"
+    right: "অতিরিক্ত"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-033
+    text: "সে খুব দ্রুত সাইকেল চালাতে পারদর্শি।"
+    error_class: NON_WORD
+    wrong: "পারদর্শি"
+    right: "পারদর্শী"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-034
+    text: "আমাদের সমাজে নারীদের ভূমিকা অপরিসিম।"
+    error_class: NON_WORD
+    wrong: "অপরিসিম"
+    right: "অপরিসীম"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-035
+    text: "তিনি বিষয়টি বিস্তারিতভাবে ব্যাক্ষা করলেন।"
+    error_class: NON_WORD
+    wrong: "ব্যাক্ষা"
+    right: "ব্যাখ্যা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-036
+    text: "গ্রামের মানুষ এখনও কুসংষ্কারে বিশ্বাস করে।"
+    error_class: NON_WORD
+    wrong: "কুসংষ্কারে"
+    right: "কুসংস্কারে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-037
+    text: "তার চেহারায় ক্লান্তির ছাপ স্পষ্ঠ।"
+    error_class: NON_WORD
+    wrong: "স্পষ্ঠ"
+    right: "স্পষ্ট"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-038
+    text: "এই ওষুধটি রোগ প্রতিরোদে সহায়ক।"
+    error_class: NON_WORD
+    wrong: "প্রতিরোদে"
+    right: "প্রতিরোধে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+    note: >-
+      Known false negative. The lexicon's productive-prefix rule strips প্রতি and
+      accepts the remainder রোদে (a real word), so this error can never be caught
+      at Stage 1. Kept deliberately: it is correct Bengali data, and the eval
+      should report the miss rather than hide it. Stage 2 has the sentence
+      context to resolve it.
+  - id: nw-039
+    text: "সে সবসময় নিয়মানুবর্তিতা মেনে চলে না, বরং অবহেলা করে তার দ্বায়িত্ব।"
+    error_class: NON_WORD
+    wrong: "দ্বায়িত্ব"
+    right: "দায়িত্ব"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-040
+    text: "আমরা বিদ্যালয়ের বার্ষিক অনুষ্ঠানে অংশগ্রহন করলাম।"
+    error_class: NON_WORD
+    wrong: "অংশগ্রহন"
+    right: "অংশগ্রহণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-041
+    text: "তিনি অত্যন্ত বিনয়ি স্বভাবের মানুষ।"
+    error_class: NON_WORD
+    wrong: "বিনয়ি"
+    right: "বিনয়ী"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-042
+    text: "শহরের পরিবেশ দিন দিন দূষিতো হচ্ছে।"
+    error_class: NON_WORD
+    wrong: "দূষিতো"
+    right: "দূষিত"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-043
+    text: "এই বইটিতে অনেক তথ্ল রয়েছে।"
+    error_class: NON_WORD
+    wrong: "তথ্ল"
+    right: "তথ্য"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-044
+    text: "সে পরীক্ষায় ভালো ফলাফল করেছে বলে সবাই প্রসংশা করছে।"
+    error_class: NON_WORD
+    wrong: "প্রসংশা"
+    right: "প্রশংসা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-045
+    text: "তার মুখে একটি রহষ্যময় হাসি ছিল।"
+    error_class: NON_WORD
+    wrong: "রহষ্যময়"
+    right: "রহস্যময়"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-046
+    text: "আমরা তার সাথে যোগাযোগ করতে ব্যার্থ হয়েছি।"
+    error_class: NON_WORD
+    wrong: "ব্যার্থ"
+    right: "ব্যর্থ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-047
+    text: "জেলেরা সারা বছর নদীতে মাছ ধরে জিবিকা নির্বাহ করে।"
+    error_class: NON_WORD
+    wrong: "জিবিকা"
+    right: "জীবিকা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-048
+    text: "তিনি একজন সৎ ও নিষ্ঠাবাণ কর্মী।"
+    error_class: NON_WORD
+    wrong: "নিষ্ঠাবাণ"
+    right: "নিষ্ঠাবান"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-049
+    text: "এই সিদ্ধান্ত নেওয়ার আগে ভালোভাবে চিন্তাভাবণা করা দরকার।"
+    error_class: NON_WORD
+    wrong: "চিন্তাভাবণা"
+    right: "চিন্তাভাবনা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: nw-050
+    text: "শিক্ষার্থীরা পরীক্ষার ফলাফল নিয়ে উদ্বীগ্ন।"
+    error_class: NON_WORD
+    wrong: "উদ্বীগ্ন"
+    right: "উদ্বিগ্ন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored

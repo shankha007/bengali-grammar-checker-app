@@ -1,0 +1,237 @@
+# HOMONYM — সমোচ্চারিত ভিন্নার্থক শব্দ
+#
+# The erroneous token is a REAL, correctly-spelt word — just the wrong one for
+# this context. That is what makes the class hard: no dictionary lookup can see
+# it, and the spec's cited research puts LLM accuracy here below 20%.
+#
+# Consequence for Phase 1: recall on this slice is expected to be near zero.
+# Stage 1 has three collocation rules and nothing else. These cases are here as
+# training and evaluation material for the Stage 2 BanglaBERT head, and as the
+# measure of how much that head buys.
+#
+# Every `wrong` form below MUST be a real word. If it is not, the case belongs
+# in non_word.yaml — validate_gold.py checks this.
+#
+# review: model — see eval/gold/README.md.
+
+cases:
+  - id: hm-001
+    text: "আমি আসা করি তুমি আসবে।"
+    error_class: HOMONYM
+    wrong: "আসা"
+    right: "আশা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+    note: "আশা করি is a fixed collocation; Stage 1 catches this one"
+  - id: hm-002
+    text: "তিনি দিন-দুঃখী মানুষের পাশে দাঁড়িয়েছেন।"
+    error_class: HOMONYM
+    wrong: "দিন"
+    right: "দীন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-003
+    text: "নদীর কুলে বসে সে গান গাইছিল।"
+    error_class: HOMONYM
+    wrong: "কুলে"
+    right: "কূলে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-004
+    text: "সে নিল রঙের একটি জামা পরেছে।"
+    error_class: HOMONYM
+    wrong: "নিল"
+    right: "নীল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-005
+    text: "গরিব মানুষের ঘরে অন্য জোটে না।"
+    error_class: HOMONYM
+    wrong: "অন্য"
+    right: "অন্ন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-006
+    text: "তিনি দেশের একজন সম্মানিত মন্ত্র।"
+    error_class: HOMONYM
+    wrong: "মন্ত্র"
+    right: "মন্ত্রী"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-007
+    text: "আমি কাল রঙের কাপড় পছন্দ করি।"
+    error_class: HOMONYM
+    wrong: "কাল"
+    right: "কালো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-008
+    text: "তৃষ্ণায় গলা শুকিয়ে গেছে, একটু বারি দাও।"
+    error_class: HOMONYM
+    wrong: "বারি"
+    right: "বাড়ি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+    note: "reviewer check: বারি = water (তৎসম) is also possible here; if so this case is invalid"
+  - id: hm-009
+    text: "উনুনের আগুনে কাঠ জল উঠল।"
+    error_class: HOMONYM
+    wrong: "জল"
+    right: "জ্বল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-011
+    text: "তার হাতের কর গুনে সে হিসাব করল।"
+    error_class: HOMONYM
+    wrong: "কর"
+    right: "কড়"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-012
+    text: "রাজা প্রজাদের কাছ থেকে কড় আদায় করতেন।"
+    error_class: HOMONYM
+    wrong: "কড়"
+    right: "কর"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-013
+    text: "সে সকালে উঠে সূর্য প্রণাম করে না, বরং শকাল পর্যন্ত ঘুমায়।"
+    error_class: HOMONYM
+    wrong: "শকাল"
+    right: "সকাল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-014
+    text: "বইটি আমার খুব ভাল লেগেছে, বিশেষত তার শেষ পরিছেদ।"
+    error_class: HOMONYM
+    wrong: "পরিছেদ"
+    right: "পরিচ্ছেদ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-015
+    text: "এই ব্যাপারে তার কোনো ভুমিকা নেই।"
+    error_class: HOMONYM
+    wrong: "ভুমিকা"
+    right: "ভূমিকা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-016
+    text: "তিনি সৎ পথে চলেন এবং সব সময় সত বলেন।"
+    error_class: HOMONYM
+    wrong: "সত"
+    right: "সত্য"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-017
+    text: "পাখিটি গাছের ডালে বসে আছে, তার ডাক শোনা যায় বহু দুর থেকে।"
+    error_class: HOMONYM
+    wrong: "দুর"
+    right: "দূর"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-019
+    text: "মাঠে অনেক ধান ফলেছে, কৃষকের মুখে হাসি ফুটেছে এবার শীত কালে।"
+    error_class: HOMONYM
+    wrong: "শীত কালে"
+    right: "শীতকালে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-020
+    text: "তার বাড়ির পাশে একটি বড় পুকুর আছে, সেখানে সে রোজ শান করে।"
+    error_class: HOMONYM
+    wrong: "শান"
+    right: "স্নান"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-021
+    text: "নদীর পাড় ভেঙে যাচ্ছে, তাই গ্রামবাসীরা বাধ দিয়েছে।"
+    error_class: HOMONYM
+    wrong: "বাধ"
+    right: "বাঁধ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-023
+    text: "রাতের আকাশে অসংখ্য তারা জ্বলজ্বল করছে, চাঁদের আলোয় ভরে গেছে চার দিক।"
+    error_class: HOMONYM
+    wrong: "চার দিক"
+    right: "চারদিক"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-024
+    text: "তিনি একজন বিখ্যাত চিত্রকর, তাঁর আঁকা ছবি দেশ বিদেশে সমাদৃত।"
+    error_class: HOMONYM
+    wrong: "দেশ বিদেশে"
+    right: "দেশে-বিদেশে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-026
+    text: "গ্রামের মেলায় অনেক ভিড় হয়েছিল, সবাই আনন্দে মেতে উঠেছিল সেদিন বিকেল বেলা।"
+    error_class: HOMONYM
+    wrong: "বিকেল বেলা"
+    right: "বিকেলবেলা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-029
+    text: "এই পথে গেলে তাড়াতাড়ি পৌঁছানো যাবে, তবে রাস্তা কিছুটা দুর্গম ও পাথ সংকীর্ণ।"
+    error_class: HOMONYM
+    wrong: "পাথ"
+    right: "পথ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: hm-030
+    text: "তিনি বহু বছর ধরে এই প্রতিষ্ঠানের সাথে যুক্ত আছেন এবং তার সেবা অতুলনীয়।"
+    error_class: HOMONYM
+    wrong: "তার"
+    right: "তাঁর"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+    note: "honorific ৺ঁ; arguably AGREEMENT rather than HOMONYM — reviewer decides"
+  # --- second pass, 2026-08-04. Reported from real use: the checker passed
+  # "আমি শারি পড়ে বিদ্যালয়ে যাইব" as clean. Three errors in seven words, and
+  # the dictionary was itself part of the problem — it accepted শারি and
+  # rejected শাড়ি.
+  - id: hm-031
+    text: "আমি শারি পরে বিদ্যালয়ে যাব।"
+    error_class: HOMONYM
+    wrong: "শারি"
+    right: "শাড়ি"
+    review: model
+    source: model-authored
+  - id: hm-032
+    text: "সে শাড়ি পড়ে অনুষ্ঠানে গেল।"
+    error_class: HOMONYM
+    wrong: "পড়ে"
+    right: "পরে"
+    review: model
+    source: model-authored
+  - id: hm-033
+    text: "মেয়েটি নতুন জামা পড়ে স্কুলে এসেছে।"
+    error_class: HOMONYM
+    wrong: "পড়ে"
+    right: "পরে"
+    review: model
+    source: model-authored

@@ -1,0 +1,147 @@
+{
+  "macro_f05": 0.8372,
+  "clean_fp_rate": 0.0,
+  "gold_total": 376,
+  "gold_verified": 353,
+  "gold_model_reviewed": 23,
+  "latency_p50": 11.49,
+  "latency_p95": 1024.41,
+  "latency_p99": 1112.92,
+  "stage_distribution": {
+    "1": 264
+  },
+  "per_class": {
+    "NON_WORD": {
+      "error_class": "NON_WORD",
+      "support": 50,
+      "tp": 49,
+      "fp": 24,
+      "fn": 1,
+      "implemented": true,
+      "precision": 0.6712,
+      "recall": 0.98,
+      "f05": 0.7164
+    },
+    "HOMONYM": {
+      "error_class": "HOMONYM",
+      "support": 27,
+      "tp": 4,
+      "fp": 0,
+      "fn": 23,
+      "implemented": true,
+      "precision": 1.0,
+      "recall": 0.1481,
+      "f05": 0.4651
+    },
+    "NOTVA_SHOTVA": {
+      "error_class": "NOTVA_SHOTVA",
+      "support": 60,
+      "tp": 42,
+      "fp": 0,
+      "fn": 18,
+      "implemented": true,
+      "precision": 1.0,
+      "recall": 0.7,
+      "f05": 0.9211
+    },
+    "CASE_MARKER": {
+      "error_class": "CASE_MARKER",
+      "support": 25,
+      "tp": 0,
+      "fp": 0,
+      "fn": 25,
+      "implemented": false,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f05": 0.0
+    },
+    "CLASSIFIER": {
+      "error_class": "CLASSIFIER",
+      "support": 25,
+      "tp": 18,
+      "fp": 0,
+      "fn": 7,
+      "implemented": true,
+      "precision": 1.0,
+      "recall": 0.72,
+      "f05": 0.9278
+    },
+    "VERB_INFLECTION": {
+      "error_class": "VERB_INFLECTION",
+      "support": 35,
+      "tp": 28,
+      "fp": 1,
+      "fn": 7,
+      "implemented": true,
+      "precision": 0.9655,
+      "recall": 0.8,
+      "f05": 0.9272
+    },
+    "WORD_ORDER": {
+      "error_class": "WORD_ORDER",
+      "support": 20,
+      "tp": 0,
+      "fp": 0,
+      "fn": 20,
+      "implemented": false,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f05": 0.0
+    },
+    "POS_ERROR": {
+      "error_class": "POS_ERROR",
+      "support": 22,
+      "tp": 0,
+      "fp": 0,
+      "fn": 22,
+      "implemented": false,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f05": 0.0
+    },
+    "AGREEMENT": {
+      "error_class": "AGREEMENT",
+      "support": 25,
+      "tp": 8,
+      "fp": 1,
+      "fn": 17,
+      "implemented": true,
+      "precision": 0.8889,
+      "recall": 0.32,
+      "f05": 0.6557
+    },
+    "GURUCHANDALI_DOSHA": {
+      "error_class": "GURUCHANDALI_DOSHA",
+      "support": 45,
+      "tp": 45,
+      "fp": 2,
+      "fn": 0,
+      "implemented": true,
+      "precision": 0.9574,
+      "recall": 1.0,
+      "f05": 0.9657
+    },
+    "REGISTER_INCONSISTENCY": {
+      "error_class": "REGISTER_INCONSISTENCY",
+      "support": 12,
+      "tp": 11,
+      "fp": 0,
+      "fn": 1,
+      "implemented": true,
+      "precision": 1.0,
+      "recall": 0.9167,
+      "f05": 0.9821
+    },
+    "PUNCTUATION": {
+      "error_class": "PUNCTUATION",
+      "support": 30,
+      "tp": 30,
+      "fp": 1,
+      "fn": 0,
+      "implemented": true,
+      "precision": 0.9677,
+      "recall": 1.0,
+      "f05": 0.974
+    }
+  }
+}

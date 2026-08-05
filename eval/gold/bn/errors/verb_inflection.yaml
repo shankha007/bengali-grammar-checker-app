@@ -1,0 +1,307 @@
+# VERB_INFLECTION — ক্রিয়ার রূপভ্রম
+#
+# Bengali verbs agree with the subject's PERSON and HONORIFIC level. Three
+# second-person grades — তুই (intimate/inferior), তুমি (familiar), আপনি
+# (respectful) — each take a distinct ending, and third person splits সে / তিনি
+# the same way. Getting this wrong is not a stylistic slip; it changes who the
+# sentence is addressing and how.
+#
+# No detector until Phase 2 (Stage 2 token classification). Recall is 0.0 today
+# and the eval reports it as such rather than omitting the row.
+#
+# review: model — see eval/gold/README.md.
+
+cases:
+  # --- second person: আপনি requires -ন
+  - id: vi-001
+    text: "আপনি কোথায় যাচ্ছ?"
+    error_class: VERB_INFLECTION
+    wrong: "যাচ্ছ"
+    right: "যাচ্ছেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-002
+    text: "আপনি কী বলছ এসব?"
+    error_class: VERB_INFLECTION
+    wrong: "বলছ"
+    right: "বলছেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-003
+    text: "আপনি কাল আমার বাড়িতে এসো।"
+    error_class: VERB_INFLECTION
+    wrong: "এসো"
+    right: "আসুন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-004
+    text: "আপনি এই বইটি পড়েছ কি?"
+    error_class: VERB_INFLECTION
+    wrong: "পড়েছ"
+    right: "পড়েছেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-005
+    text: "আপনি দয়া করে এখানে বোসো।"
+    error_class: VERB_INFLECTION
+    wrong: "বোসো"
+    right: "বসুন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- second person: তুই requires -িস
+  - id: vi-006
+    text: "তুই কোথায় যাচ্ছেন?"
+    error_class: VERB_INFLECTION
+    wrong: "যাচ্ছেন"
+    right: "যাচ্ছিস"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-007
+    text: "তুই কী করছেন এখানে?"
+    error_class: VERB_INFLECTION
+    wrong: "করছেন"
+    right: "করছিস"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-008
+    text: "তুই কাল আসবেন তো?"
+    error_class: VERB_INFLECTION
+    wrong: "আসবেন"
+    right: "আসবি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-009
+    text: "তুই এই কাজটা করেছ?"
+    error_class: VERB_INFLECTION
+    wrong: "করেছ"
+    right: "করেছিস"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-010
+    text: "তুই আমাকে বলেছেন কথাটা।"
+    error_class: VERB_INFLECTION
+    wrong: "বলেছেন"
+    right: "বলেছিস"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- second person: তুমি requires -ো / -ছ
+  - id: vi-011
+    text: "তুমি কোথায় যাচ্ছেন?"
+    error_class: VERB_INFLECTION
+    wrong: "যাচ্ছেন"
+    right: "যাচ্ছ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-012
+    text: "তুমি কী বলছিস?"
+    error_class: VERB_INFLECTION
+    wrong: "বলছিস"
+    right: "বলছ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-013
+    text: "তুমি কাল আসবেন কি?"
+    error_class: VERB_INFLECTION
+    wrong: "আসবেন"
+    right: "আসবে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-014
+    text: "তুমি বইটি পড়েছিস?"
+    error_class: VERB_INFLECTION
+    wrong: "পড়েছিস"
+    right: "পড়েছ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-015
+    text: "তুমি দয়া করে বসুন এখানে।"
+    error_class: VERB_INFLECTION
+    wrong: "বসুন"
+    right: "বসো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- third person honorific: তিনি requires -ন
+  - id: vi-016
+    text: "তিনি গতকাল বাড়ি গেল।"
+    error_class: VERB_INFLECTION
+    wrong: "গেল"
+    right: "গেলেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-017
+    text: "তিনি এই বইটি লিখেছে।"
+    error_class: VERB_INFLECTION
+    wrong: "লিখেছে"
+    right: "লিখেছেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-018
+    text: "তিনি সকালে অফিসে যায়।"
+    error_class: VERB_INFLECTION
+    wrong: "যায়"
+    right: "যান"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-019
+    text: "শিক্ষক মহোদয় ক্লাসে এসেছে।"
+    error_class: VERB_INFLECTION
+    wrong: "এসেছে"
+    right: "এসেছেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-020
+    text: "তিনি আমাদের সব বুঝিয়ে দিল।"
+    error_class: VERB_INFLECTION
+    wrong: "দিল"
+    right: "দিলেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- first person
+  - id: vi-021
+    text: "আমরা কাল সেখানে যাবেন।"
+    error_class: VERB_INFLECTION
+    wrong: "যাবেন"
+    right: "যাব"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-022
+    text: "আমি এই কাজটি করেছেন।"
+    error_class: VERB_INFLECTION
+    wrong: "করেছেন"
+    right: "করেছি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-023
+    text: "আমি কাল তোমার বাড়ি যাবে।"
+    error_class: VERB_INFLECTION
+    wrong: "যাবে"
+    right: "যাব"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-024
+    text: "আমরা সবাই মিলে কাজটি করছেন।"
+    error_class: VERB_INFLECTION
+    wrong: "করছেন"
+    right: "করছি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-025
+    text: "আমি বইটি পড়েছ গতকাল।"
+    error_class: VERB_INFLECTION
+    wrong: "পড়েছ"
+    right: "পড়েছি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- third person non-honorific
+  - id: vi-026
+    text: "সে গতকাল বাড়ি গেলেন।"
+    error_class: VERB_INFLECTION
+    wrong: "গেলেন"
+    right: "গেল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-027
+    text: "ছেলেটি মাঠে খেলছেন।"
+    error_class: VERB_INFLECTION
+    wrong: "খেলছেন"
+    right: "খেলছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-028
+    text: "সে আমাকে চিঠিটি দিলেন।"
+    error_class: VERB_INFLECTION
+    wrong: "দিলেন"
+    right: "দিল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-029
+    text: "কুকুরটি জোরে ডাকছেন।"
+    error_class: VERB_INFLECTION
+    wrong: "ডাকছেন"
+    right: "ডাকছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-030
+    text: "তারা কাল ঢাকা যাবেন বলে ঠিক করেছে।"
+    error_class: VERB_INFLECTION
+    wrong: "যাবেন"
+    right: "যাবে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- tense / aspect mismatch
+  - id: vi-031
+    text: "গতকাল আমি বাজারে যাব।"
+    error_class: VERB_INFLECTION
+    wrong: "যাব"
+    right: "গিয়েছিলাম"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-032
+    text: "আগামীকাল সে ঢাকা গিয়েছিল।"
+    error_class: VERB_INFLECTION
+    wrong: "গিয়েছিল"
+    right: "যাবে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-033
+    text: "এখন সে বাড়ি গিয়েছিল।"
+    error_class: VERB_INFLECTION
+    wrong: "গিয়েছিল"
+    right: "যাচ্ছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-034
+    text: "কাল রাতে আমি বইটি পড়ব এবং শেষ করেছিলাম।"
+    error_class: VERB_INFLECTION
+    wrong: "পড়ব"
+    right: "পড়েছিলাম"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: vi-035
+    text: "প্রতিদিন সকালে সে হাঁটতে গিয়েছিল।"
+    error_class: VERB_INFLECTION
+    wrong: "গিয়েছিল"
+    right: "যায়"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored

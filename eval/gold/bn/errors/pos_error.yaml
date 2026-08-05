@@ -1,0 +1,200 @@
+# POS_ERROR — পদ-ভ্রম
+#
+# The wrong part of speech in a slot: an abstract noun where an adverb belongs
+# (দ্রুততা দৌড়াল for দ্রুত দৌড়াল), an adjective where a noun belongs, a verbal
+# noun where a finite verb belongs.
+#
+# Bengali derivational morphology makes this a productive error: -তা makes an
+# abstract noun, -ভাবে makes an adverb, and choosing the wrong one is easy and
+# common.
+#
+# No detector until Phase 2. review: model — see eval/gold/README.md.
+
+cases:
+  # --- abstract noun where an adverb is needed
+  - id: pe-001
+    text: "সে দ্রুততা দৌড়াল মাঠের দিকে।"
+    error_class: POS_ERROR
+    wrong: "দ্রুততা"
+    right: "দ্রুত"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-002
+    text: "আমি সততা কাজ করি।"
+    error_class: POS_ERROR
+    wrong: "সততা"
+    right: "সততার সঙ্গে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-003
+    text: "সে সুন্দরতা গান গায়।"
+    error_class: POS_ERROR
+    wrong: "সুন্দরতা"
+    right: "সুন্দরভাবে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-004
+    text: "তিনি স্পষ্টতা কথা বললেন।"
+    error_class: POS_ERROR
+    wrong: "স্পষ্টতা"
+    right: "স্পষ্টভাবে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-005
+    text: "ছেলেটি মনোযোগিতা পড়ছে।"
+    error_class: POS_ERROR
+    wrong: "মনোযোগিতা"
+    right: "মনোযোগ দিয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- adverb where an adjective is needed
+  - id: pe-006
+    text: "তার গান খুব সুন্দরভাবে।"
+    error_class: POS_ERROR
+    wrong: "সুন্দরভাবে"
+    right: "সুন্দর"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-007
+    text: "এই বইটি অত্যন্ত ভালোভাবে।"
+    error_class: POS_ERROR
+    wrong: "ভালোভাবে"
+    right: "ভালো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-008
+    text: "মেয়েটি খুব দ্রুতভাবে এবং বুদ্ধিমতী।"
+    error_class: POS_ERROR
+    wrong: "দ্রুতভাবে"
+    right: "চটপটে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- adjective where a noun is needed
+  - id: pe-009
+    text: "তার সুন্দর সবাইকে মুগ্ধ করেছে।"
+    error_class: POS_ERROR
+    wrong: "সুন্দর"
+    right: "সৌন্দর্য"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-010
+    text: "তার সৎ সবাই প্রশংসা করে।"
+    error_class: POS_ERROR
+    wrong: "সৎ"
+    right: "সততার"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-011
+    text: "এই কাজে অনেক কঠিন আছে।"
+    error_class: POS_ERROR
+    wrong: "কঠিন"
+    right: "কাঠিন্য"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-012
+    text: "তার সাহসী সবাইকে অনুপ্রাণিত করেছে।"
+    error_class: POS_ERROR
+    wrong: "সাহসী"
+    right: "সাহস"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- verbal noun where a finite verb is needed
+  - id: pe-013
+    text: "সে প্রতিদিন সকালে হাঁটা।"
+    error_class: POS_ERROR
+    wrong: "হাঁটা"
+    right: "হাঁটে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-014
+    text: "আমি রোজ বই পড়া।"
+    error_class: POS_ERROR
+    wrong: "পড়া"
+    right: "পড়ি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-015
+    text: "তারা মাঠে খেলা প্রতিদিন বিকেলে।"
+    error_class: POS_ERROR
+    wrong: "খেলা"
+    right: "খেলে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- finite verb where a verbal noun is needed
+  - id: pe-016
+    text: "সাঁতার কাটে আমার খুব প্রিয়।"
+    error_class: POS_ERROR
+    wrong: "কাটে"
+    right: "কাটা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-017
+    text: "বই পড়ি একটি ভালো অভ্যাস।"
+    error_class: POS_ERROR
+    wrong: "পড়ি"
+    right: "পড়া"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-018
+    text: "সকালে হাঁটে স্বাস্থ্যের জন্য উপকারী।"
+    error_class: POS_ERROR
+    wrong: "হাঁটে"
+    right: "হাঁটা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- noun where an adjective is needed
+  - id: pe-019
+    text: "সে একজন সাহস মানুষ।"
+    error_class: POS_ERROR
+    wrong: "সাহস"
+    right: "সাহসী"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-020
+    text: "এটি একটি জ্ঞান বই।"
+    error_class: POS_ERROR
+    wrong: "জ্ঞান"
+    right: "জ্ঞানগর্ভ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-021
+    text: "তিনি একজন সৌন্দর্য নারী।"
+    error_class: POS_ERROR
+    wrong: "সৌন্দর্য"
+    right: "সুন্দরী"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: pe-022
+    text: "সে একজন বুদ্ধি ছেলে।"
+    error_class: POS_ERROR
+    wrong: "বুদ্ধি"
+    right: "বুদ্ধিমান"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored

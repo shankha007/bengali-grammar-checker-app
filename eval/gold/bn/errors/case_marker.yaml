@@ -1,0 +1,225 @@
+# CASE_MARKER — বিভক্তি-ভ্রম
+#
+# Bengali marks কারক with বিভক্তি suffixes:
+#
+#   -কে   objective / dative, and animate direct objects
+#   -র/-এর genitive
+#   -তে/-এ locative (place, time, instrument)
+#   -য়    locative after a vowel-final stem
+#   ০     nominative, and inanimate direct objects
+#
+# The commonest real error is -কে where a locative is needed (স্কুলকে যায় for
+# স্কুলে যায়), and the reverse on animate objects.
+#
+# No detector until Phase 2. review: model — see eval/gold/README.md.
+
+cases:
+  # --- -কে where a locative belongs
+  - id: cm-001
+    text: "সে প্রতিদিন স্কুলকে যায়।"
+    error_class: CASE_MARKER
+    wrong: "স্কুলকে"
+    right: "স্কুলে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-002
+    text: "আমি সন্ধ্যায় বাড়িকে ফিরে এলাম।"
+    error_class: CASE_MARKER
+    wrong: "বাড়িকে"
+    right: "বাড়িতে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-003
+    text: "তারা বাজারকে গিয়েছিল।"
+    error_class: CASE_MARKER
+    wrong: "বাজারকে"
+    right: "বাজারে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-004
+    text: "ছেলেটি মাঠকে খেলছে।"
+    error_class: CASE_MARKER
+    wrong: "মাঠকে"
+    right: "মাঠে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-005
+    text: "সে ঢাকাকে থাকে।"
+    error_class: CASE_MARKER
+    wrong: "ঢাকাকে"
+    right: "ঢাকায়"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-006
+    text: "আমরা নদীকে সাঁতার কাটলাম।"
+    error_class: CASE_MARKER
+    wrong: "নদীকে"
+    right: "নদীতে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-007
+    text: "বইটি টেবিলকে রাখা আছে।"
+    error_class: CASE_MARKER
+    wrong: "টেবিলকে"
+    right: "টেবিলে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-008
+    text: "পাখিটি গাছকে বসে আছে।"
+    error_class: CASE_MARKER
+    wrong: "গাছকে"
+    right: "গাছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- missing -কে on an animate object
+  - id: cm-009
+    text: "আমি ছেলেটি ডাকলাম।"
+    error_class: CASE_MARKER
+    wrong: "ছেলেটি"
+    right: "ছেলেটিকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-010
+    text: "সে তার বন্ধু সাহায্য করেছে।"
+    error_class: CASE_MARKER
+    wrong: "বন্ধু"
+    right: "বন্ধুকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-011
+    text: "শিক্ষক ছাত্র বকলেন।"
+    error_class: CASE_MARKER
+    wrong: "ছাত্র"
+    right: "ছাত্রকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-012
+    text: "মা শিশু কোলে তুলে নিলেন।"
+    error_class: CASE_MARKER
+    wrong: "শিশু"
+    right: "শিশুকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- genitive vs objective
+  - id: cm-013
+    text: "ছেলেটি বাবার বইটি দিল।"
+    error_class: CASE_MARKER
+    wrong: "বাবার"
+    right: "বাবাকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-014
+    text: "আমি তারকে বইটি দিলাম।"
+    error_class: CASE_MARKER
+    wrong: "তারকে"
+    right: "তাকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-015
+    text: "এটি আমাকে বই।"
+    error_class: CASE_MARKER
+    wrong: "আমাকে"
+    right: "আমার"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-016
+    text: "সে তাকে ভাই।"
+    error_class: CASE_MARKER
+    wrong: "তাকে"
+    right: "তার"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-017
+    text: "আমাদেরকে দেশ খুব সুন্দর।"
+    error_class: CASE_MARKER
+    wrong: "আমাদেরকে"
+    right: "আমাদের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- wrong locative allomorph
+  - id: cm-018
+    text: "সে ঢাকাতে গিয়েছে বলে শুনেছি, তবে থাকে কলকাতাে।"
+    error_class: CASE_MARKER
+    wrong: "কলকাতাে"
+    right: "কলকাতায়"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-019
+    text: "আমরা সকালতে বেরিয়ে পড়েছি।"
+    error_class: CASE_MARKER
+    wrong: "সকালতে"
+    right: "সকালে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-020
+    text: "সে রাতেতে ঘুমায় না।"
+    error_class: CASE_MARKER
+    wrong: "রাতেতে"
+    right: "রাতে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-021
+    text: "গাড়িটি রাস্তায়তে দাঁড়িয়ে আছে।"
+    error_class: CASE_MARKER
+    wrong: "রাস্তায়তে"
+    right: "রাস্তায়"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- ablative and instrumental
+  - id: cm-022
+    text: "সে ঢাকাকে এসেছে গতকাল।"
+    error_class: CASE_MARKER
+    wrong: "ঢাকাকে"
+    right: "ঢাকা থেকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-023
+    text: "সে কলমকে লিখছে।"
+    error_class: CASE_MARKER
+    wrong: "কলমকে"
+    right: "কলম দিয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-024
+    text: "আমি বাসকে অফিসে যাই।"
+    error_class: CASE_MARKER
+    wrong: "বাসকে"
+    right: "বাসে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cm-025
+    text: "তিনি ছুরিকে ফল কাটলেন।"
+    error_class: CASE_MARKER
+    wrong: "ছুরিকে"
+    right: "ছুরি দিয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored

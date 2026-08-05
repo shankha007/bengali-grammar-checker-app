@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bhashasetu-api",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "bhashasetu.api.app:app", "--reload", "--port", "8000"],
+      "env": { "PYTHONPATH": "src", "PYTHONIOENCODING": "utf-8" },
+      "port": 8000
+    },
+    {
+      "name": "bhashasetu-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "frontend",
+      "port": 3000
+    }
+  ]
+}

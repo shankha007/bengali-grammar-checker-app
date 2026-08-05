@@ -1,0 +1,514 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Theming is CSS-variable driven, not Tailwind `dark:` variants, because there
+ * are five themes rather than two. Components reference semantic names
+ * (--surface, --text-muted) so adding a sixth theme is one block here and one
+ * entry in ThemeSwitcher — no component changes.
+ */
+
+:root,
+[data-theme="light"] {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f5;
+  --border: #dfe3e8;
+  --text: #10151c;
+  --text-muted: #667085;
+  --accent: #2563eb;
+  --accent-fg: #ffffff;
+  --ok: #047857;
+  --warn-bg: #fef7e0;
+  --warn-fg: #7a5b00;
+  /* Out-of-scope highlight. Yellow, flat fill — deliberately unlike the wavy
+     error underlines, because "I cannot judge this" is not "this is wrong". */
+  --unsupported: #f5d90a;
+  --unsupported-fill: rgba(245, 217, 10, 0.32);
+  --cat-orthography: #d92d20;
+  --cat-morphology: #d97706;
+  --cat-syntax: #7c3aed;
+  --cat-register: #0891b2;
+  --cat-punctuation: #4d7c0f;
+}
+
+[data-theme="dark"] {
+  --bg: #0b0f14;
+  --surface: #121820;
+  --surface-2: #19212b;
+  --border: #26303c;
+  --text: #e6edf3;
+  --text-muted: #8b98a5;
+  --accent: #4f8cff;
+  --accent-fg: #06101f;
+  --ok: #3ddc97;
+  --warn-bg: #3a2f10;
+  --warn-fg: #f5d98b;
+  --unsupported: #f5d90a;
+  --unsupported-fill: rgba(245, 217, 10, 0.22);
+  --cat-orthography: #ff6b6b;
+  --cat-morphology: #fbbf24;
+  --cat-syntax: #b794f6;
+  --cat-register: #4dd0e1;
+  --cat-punctuation: #a3e635;
+}
+
+/* Warm, low-contrast. Long editing sessions; easier on the eyes than pure white. */
+[data-theme="sepia"] {
+  --bg: #f4ecd8;
+  --surface: #fbf5e6;
+  --surface-2: #efe4cc;
+  --border: #ddceb0;
+  --text: #3b2f1c;
+  --text-muted: #7a6a4f;
+  --accent: #9a5b1f;
+  --accent-fg: #fffaf0;
+  --ok: #4d6b2f;
+  --warn-bg: #f0e0bb;
+  --warn-fg: #6b4e12;
+  --unsupported: #c8951a;
+  --unsupported-fill: rgba(200, 149, 26, 0.28);
+  --cat-orthography: #b3261e;
+  --cat-morphology: #a35c00;
+  --cat-syntax: #6b4ea8;
+  --cat-register: #17696f;
+  --cat-punctuation: #4d6b2f;
+}
+
+/* Cool dark, lower contrast than `dark` for low-light rooms. */
+[data-theme="nord"] {
+  --bg: #2e3440;
+  --surface: #3b4252;
+  --surface-2: #434c5e;
+  --border: #4c566a;
+  --text: #eceff4;
+  --text-muted: #a8b1c2;
+  --accent: #88c0d0;
+  --accent-fg: #2e3440;
+  --ok: #a3be8c;
+  --warn-bg: #4a4433;
+  --warn-fg: #ebcb8b;
+  --unsupported: #ebcb8b;
+  --unsupported-fill: rgba(235, 203, 139, 0.26);
+  --cat-orthography: #bf616a;
+  --cat-morphology: #d08770;
+  --cat-syntax: #b48ead;
+  --cat-register: #88c0d0;
+  --cat-punctuation: #a3be8c;
+}
+
+/*
+ * WCAG 2.2 AAA-oriented (spec §10 asks for AA). Pure black on white, saturated
+ * category colours, thicker underlines. Not a "nice" theme — an accessible one.
+ */
+[data-theme="contrast"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --border: #000000;
+  --text: #000000;
+  --text-muted: #333333;
+  --accent: #0000cc;
+  --accent-fg: #ffffff;
+  --ok: #006600;
+  --warn-bg: #ffffcc;
+  --warn-fg: #000000;
+  --unsupported: #b58900;
+  --unsupported-fill: rgba(255, 221, 0, 0.55);
+  --cat-orthography: #cc0000;
+  --cat-morphology: #995200;
+  --cat-syntax: #5500cc;
+  --cat-register: #006680;
+  --cat-punctuation: #2d5c00;
+}
+
+:root {
+  /*
+   * `--font-noto-bengali` and `--font-inter` come from next/font in layout.tsx,
+   * which self-hosts both. The named families after them are the same faces as
+   * they may exist locally, and are what renders if the variables are ever
+   * absent — a Bengali editor must not fall back to a Latin face.
+   */
+  --font-bengali: var(--font-noto-bengali), "Noto Sans Bengali", "Nirmala UI",
+    "Shonar Bangla", "Kohinoor Bangla", "Lohit Bengali", "Mukti Narrow",
+    sans-serif;
+
+  /*
+   * ONE stack for all interface text, in both languages.
+   *
+   * The Bengali faces are appended to the Latin UI stack rather than swapped in
+   * by a `.bn` class. A font-family swap changes the element's metrics, so
+   * toggling the language visibly resized the whole interface; with one stack,
+   * Latin glyphs come from the first font, Bengali glyphs fall through to Noto
+   * Sans Bengali, and `font-size` is identical either way.
+   *
+   * `.bn` still exists for Bengali *content* — the editor, and the words inside
+   * suggestions — where the Bengali face and its taller leading are required.
+   */
+  --font-ui: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", var(--font-noto-bengali), "Noto Sans Bengali", "Nirmala UI",
+    "Kohinoor Bangla", sans-serif;
+}
+
+/* Inter ships a disambiguated `l` and a straighter `1` behind `cv11`/`ss01`,
+   off by default. Worth turning on here: this interface puts Latin
+   transliterations next to Bengali, where an `l`/`I` mix-up is a reading error
+   rather than a cosmetic one. Proportional figures stay the default — `.stat`
+   opts into tabular where columns of numbers actually line up. */
+body {
+  font-feature-settings: "cv11", "ss01";
+}
+
+/*
+ * The scroll lock is scoped to the editor, not global.
+ *
+ * The editor page adds `.app-fixed` while mounted: at >=1024px its three
+ * columns sit side by side and each scrolls internally, so the page never
+ * moves. Below that the columns stack, and locking would crush three panes into
+ * one viewport — normal page scrolling is the honest answer there.
+ *
+ * The landing and analytics pages are ordinary documents and must scroll, which
+ * is why this cannot live on `html, body` unconditionally.
+ */
+html,
+body {
+  height: 100%;
+}
+
+@media (min-width: 1024px) {
+  html.app-fixed,
+  html.app-fixed body {
+    overflow: hidden;
+  }
+}
+
+/* Nothing should ever scroll sideways. A horizontal scrollbar means a child has
+   escaped its track — which `min-width: 0` on grid/flex children prevents, but
+   this is the backstop. */
+body {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.bn {
+  font-family: var(--font-bengali);
+  line-height: 1.75;
+}
+
+/* --- editor -------------------------------------------------------------
+ * Bengali typography is not cosmetic (spec §4): the matra runs along the top of
+ * every word and collides with the previous line's descenders at Latin-
+ * comfortable leading. 1.9 is the floor.
+ */
+/*
+ * The writable surface has to be the whole pane, not the height of the text.
+ *
+ * EditorContent renders an unstyled wrapper div between .bs-editor and the
+ * contenteditable, and that wrapper sizes to its content. So `min-height: 100%`
+ * on .ProseMirror resolved against a 77px wrapper inside a 372px pane: the page
+ * looked like a large blank editor, but clicking anywhere below the last line
+ * hit dead space and did not focus. The fix is to give the wrapper the height
+ * to be a percentage of — hence the flex chain, which survives the pane being
+ * resized by the drag handles.
+ */
+.bs-editor {
+  display: flex;
+  flex-direction: column;
+}
+.bs-editor > * {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.bs-editor .ProseMirror {
+  font-family: var(--font-bengali);
+  line-height: 1.9;
+  font-size: 1.0625rem;
+  letter-spacing: 0.01em;
+  outline: none;
+  padding: 1rem 1.15rem;
+  /* flex-grow fills the pane; min-height keeps it filling even when the pane is
+     taller than the flex line, and neither caps growth once the document is
+     longer than the pane. */
+  flex: 1 1 auto;
+  min-height: 100%;
+  /* A click below the last line should put the caret on the last line, which is
+     what a text area does. Without this the tall empty region is inert. */
+  cursor: text;
+}
+
+.bs-editor .ProseMirror p {
+  margin: 0 0 0.75em;
+}
+
+.bs-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--text-muted);
+}
+
+/* --- flags ---------------------------------------------------------------
+ * Wavy underline, not a background fill: a fill fights with the matra and makes
+ * conjuncts hard to read, which defeats the point of flagging.
+ */
+.bs-flag {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: var(--flag-color, var(--cat-orthography));
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.32em;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.bs-flag:hover,
+.bs-flag[data-active="true"] {
+  background-color: color-mix(in srgb, var(--flag-color) 18%, transparent);
+}
+
+[data-theme="contrast"] .bs-flag {
+  text-decoration-thickness: 2.5px;
+}
+
+/*
+ * Out of scope: flat yellow fill, no underline. The visual grammar is the
+ * message — underline means "this is wrong", highlight means "I did not read
+ * this". Conflating them would tell users their English was checked and passed.
+ */
+.bs-unsupported {
+  background-color: var(--unsupported-fill);
+  border-bottom: 2px dotted var(--unsupported);
+  border-radius: 2px;
+  cursor: help;
+}
+
+/* --- chrome -------------------------------------------------------------- */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+/*
+ * `table-layout: fixed` for the suggestion table specifically.
+ *
+ * With auto layout the six columns sized to their content, summed past the
+ * pane's width, and the action buttons were clipped off the right edge —
+ * invisible to a DOM check (nothing overflows the *document*) and only obvious
+ * in a screenshot. Fixed layout makes the declared widths authoritative and lets
+ * the two text columns share whatever is left.
+ *
+ * Scoped, not global: the key/value tables elsewhere want auto layout so their
+ * labels are not truncated at an arbitrary 50%.
+ */
+.tbl-fixed {
+  table-layout: fixed;
+}
+
+.tbl {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+.tbl thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.tbl tbody td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.tbl tbody tr {
+  cursor: pointer;
+}
+.tbl tbody tr:hover {
+  background: var(--surface-2);
+}
+.tbl tbody tr[data-selected="true"] {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.scroll-y {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.scroll-y::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-y::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.btn:hover {
+  background: var(--surface-2);
+}
+/* Two of these have to fit in a 66px column alongside padding. */
+.btn-icon {
+  padding: 1px 6px;
+  line-height: 1.3;
+}
+
+.btn-primary {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- resize handles ------------------------------------------------------
+ * 6px of grid track, with a larger invisible hit area via ::before. A handle
+ * you have to aim at is a handle people stop using; Fitts's law is not optional
+ * for a control used mid-sentence.
+ */
+.bs-handle {
+  position: relative;
+  background: transparent;
+  border-radius: 3px;
+  transition: background-color 120ms ease;
+  touch-action: none; /* let the pointer handler own the gesture on touch */
+}
+.bs-handle::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.bs-handle-v {
+  cursor: col-resize;
+}
+.bs-handle-h {
+  cursor: row-resize;
+}
+.bs-handle:hover,
+.bs-handle:focus-visible,
+.bs-handle[data-dragging] {
+  background: var(--accent);
+}
+.bs-handle[data-dragging] {
+  opacity: 0.85;
+}
+
+/* The grip: three dots, only once the handle is worth noticing. */
+.bs-handle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: var(--border);
+  border-radius: 2px;
+  transition: background-color 120ms ease;
+}
+.bs-handle-v::after {
+  width: 2px;
+  height: 26px;
+}
+.bs-handle-h::after {
+  width: 26px;
+  height: 2px;
+}
+.bs-handle:hover::after,
+.bs-handle:focus-visible::after,
+.bs-handle[data-dragging]::after {
+  background: var(--accent-fg);
+}
+
+
+/* --- nav ------------------------------------------------------------------
+ * The bar is a surface of its own, not bare text on the page background, so the
+ * extra height reads as a header rather than as slack whitespace.
+ *
+ * Its controls are a size up from the `.btn` default, which is tuned for the
+ * editor's dense toolbars; matching them there would leave a 34px brand mark
+ * next to 20px buttons. Scoped to `.nav-bar` so the editor keeps its own sizing.
+ */
+.nav-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.nav-bar .btn {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* --- links & shared page chrome ------------------------------------------ */
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+a.no-underline {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.stat {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 4px 48px;
+}

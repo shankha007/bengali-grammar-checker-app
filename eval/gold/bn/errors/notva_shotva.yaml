@@ -1,0 +1,490 @@
+# NOTVA_SHOTVA — ণত্ব ও ষত্ব বিধান
+#
+# Both বিধান apply to তৎসম words ONLY. A case belongs here when the erroneous
+# form is a ণ/ষ rule violation in a word of Sanskrit origin. If the word is
+# তদ্ভব, দেশি or বিদেশি, ন and স are correct and there is no error — those
+# belong in clean.yaml, and several are there deliberately (ঠান্ডা, ভাসা).
+#
+# review: model — see eval/gold/README.md.
+
+cases:
+  # --- second pass, added after testing the checker on prose outside the demo
+  # sample. Each of these words was already being corrected, but as NON_WORD:
+  # the right suggestion with the wrong explanation, which drops the বিধান
+  # citation that is the entire point of the class.
+  - id: ns-051
+    text: "এটি একটি উদাহরন মাত্র।"
+    error_class: NOTVA_SHOTVA
+    wrong: "উদাহরন"
+    right: "উদাহরণ"
+    review: model
+    source: model-authored
+  - id: ns-052
+    text: "এটি একটি সাধারন ভুল।"
+    error_class: NOTVA_SHOTVA
+    wrong: "সাধারন"
+    right: "সাধারণ"
+    review: model
+    source: model-authored
+  - id: ns-053
+    text: "তিনি বাক্যে বিশেষন ব্যবহার করেন।"
+    error_class: NOTVA_SHOTVA
+    wrong: "বিশেষন"
+    right: "বিশেষণ"
+    review: model
+    source: model-authored
+  - id: ns-054
+    text: "সবাই তার কাজের প্রসংসা করেছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "প্রসংসা"
+    right: "প্রশংসা"
+    review: model
+    source: model-authored
+  - id: ns-055
+    text: "কাজটি সম্পূর্ন হয়েছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "সম্পূর্ন"
+    right: "সম্পূর্ণ"
+    review: model
+    source: model-authored
+  - id: ns-056
+    text: "সরকার একটি ঘোষনা দিয়েছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ঘোষনা"
+    right: "ঘোষণা"
+    review: model
+    source: model-authored
+  - id: ns-057
+    text: "তার কন্ঠ খুব মিষ্টি।"
+    error_class: NOTVA_SHOTVA
+    wrong: "কন্ঠ"
+    right: "কণ্ঠ"
+    review: model
+    source: model-authored
+  - id: ns-058
+    text: "সে অনেক স্বর্ন কিনেছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "স্বর্ন"
+    right: "স্বর্ণ"
+    review: model
+    source: model-authored
+  - id: ns-059
+    text: "তার ভাষন সবাই শুনেছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ভাষন"
+    right: "ভাষণ"
+    review: model
+    source: model-authored
+  - id: ns-060
+    text: "এর পরিনাম ভালো হয়নি।"
+    error_class: NOTVA_SHOTVA
+    wrong: "পরিনাম"
+    right: "পরিণাম"
+    review: model
+    source: model-authored
+
+  # --- ণত্ব: ঋ / র / ষ triggers ণ in a following syllable
+  - id: ns-001
+    text: "এর কারন কী কেউ জানে না।"
+    error_class: NOTVA_SHOTVA
+    wrong: "কারন"
+    right: "কারণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-002
+    text: "তার ধারনা ছিল পরীক্ষা সহজ হবে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ধারনা"
+    right: "ধারণা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-003
+    text: "এই ব্যাকরন বইটি খুব উপকারী।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ব্যাকরন"
+    right: "ব্যাকরণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-004
+    text: "আদালতে যথেষ্ট প্রমান উপস্থাপন করা হয়েছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "প্রমান"
+    right: "প্রমাণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-005
+    text: "লেখক ঘটনার বিশদ বর্ননা দিয়েছেন।"
+    error_class: NOTVA_SHOTVA
+    wrong: "বর্ননা"
+    right: "বর্ণনা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-006
+    text: "শহীদদের স্মরনে আমরা শ্রদ্ধা জানাই।"
+    error_class: NOTVA_SHOTVA
+    wrong: "স্মরনে"
+    right: "স্মরণে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-007
+    text: "জীবন ও মরন ঈশ্বরের হাতে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "মরন"
+    right: "মরণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-008
+    text: "রামায়ন একটি প্রাচীন মহাকাব্য।"
+    error_class: NOTVA_SHOTVA
+    wrong: "রামায়ন"
+    right: "রামায়ণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-009
+    text: "বনের ভিতরে একটি হরিন দেখা গেল।"
+    error_class: NOTVA_SHOTVA
+    wrong: "হরিন"
+    right: "হরিণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-010
+    text: "মাঠজুড়ে সবুজ তৃন ছড়িয়ে আছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "তৃন"
+    right: "তৃণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-011
+    text: "কৃষক ব্যাংক থেকে ঋন নিয়েছেন।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ঋন"
+    right: "ঋণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-012
+    text: "রোগের লক্ষন দেখে চিকিৎসা শুরু হলো।"
+    error_class: NOTVA_SHOTVA
+    wrong: "লক্ষন"
+    right: "লক্ষণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-013
+    text: "সে মনোযোগ দিয়ে শ্রবন করছিল।"
+    error_class: NOTVA_SHOTVA
+    wrong: "শ্রবন"
+    right: "শ্রবণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-014
+    text: "মন্দিরে কৃষ্নের মূর্তি রয়েছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "কৃষ্নের"
+    right: "কৃষ্ণের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-015
+    text: "সমুদ্রকে অর্নব নামেও ডাকা হয়।"
+    error_class: NOTVA_SHOTVA
+    wrong: "অর্নব"
+    right: "অর্ণব"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-016
+    text: "প্রাচীন সমাজে ব্রাহ্মনদের প্রভাব ছিল।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ব্রাহ্মনদের"
+    right: "ব্রাহ্মণদের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-017
+    text: "চুম্বকের আকর্সন শক্তি প্রবল।"
+    error_class: NOTVA_SHOTVA
+    wrong: "আকর্সন"
+    right: "আকর্ষণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-018
+    text: "তার আচরনে সবাই বিরক্ত।"
+    error_class: NOTVA_SHOTVA
+    wrong: "আচরনে"
+    right: "আচরণে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-019
+    text: "নতুন আইন প্রনয়ন করা হয়েছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "প্রনয়ন"
+    right: "প্রণয়ন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-020
+    text: "সরকার নতুন নীতি গ্রহন করেছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "গ্রহন"
+    right: "গ্রহণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-021
+    text: "অনুষ্ঠানে সবাইকে নিমন্ত্রন জানানো হয়েছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "নিমন্ত্রন"
+    right: "নিমন্ত্রণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-022
+    text: "সৈন্যরা দুর্গ বেষ্টন করে দাঁড়াল, চারদিকে ছিল প্রাচীর ও তোরন।"
+    error_class: NOTVA_SHOTVA
+    wrong: "তোরন"
+    right: "তোরণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-023
+    text: "শিক্ষকের ভূমিকা সমাজে অপরিহার্য, তিনি জ্ঞানের বাহন ও দর্পন।"
+    error_class: NOTVA_SHOTVA
+    wrong: "দর্পন"
+    right: "দর্পণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-024
+    text: "সে সোনার একটি সুন্দর আভরন পরেছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "আভরন"
+    right: "আভরণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-025
+    text: "রোগ নির্নয় করতে সময় লেগেছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "নির্নয়"
+    right: "নির্ণয়"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- ণত্ব: ট-বর্গের পূর্বে ণ (তৎসম only)
+  - id: ns-026
+    text: "সে ঘন্টা খানেক অপেক্ষা করল।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ঘন্টা"
+    right: "ঘণ্টা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-027
+    text: "সভায় পন্ডিত মশাই বক্তৃতা দিলেন।"
+    error_class: NOTVA_SHOTVA
+    wrong: "পন্ডিত"
+    right: "পণ্ডিত"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-028
+    text: "বইটির প্রথম খন্ড প্রকাশিত হয়েছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "খন্ড"
+    right: "খণ্ড"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-029
+    text: "গাছের কান্ড খুব মোটা।"
+    error_class: NOTVA_SHOTVA
+    wrong: "কান্ড"
+    right: "কাণ্ড"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-030
+    text: "অপরাধীকে যথাযথ দন্ড দেওয়া হয়েছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "দন্ড"
+    right: "দণ্ড"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-031
+    text: "তিনি স্থানীয় ইউনিয়ন মন্ডলীর সদস্য।"
+    error_class: NOTVA_SHOTVA
+    wrong: "মন্ডলীর"
+    right: "মণ্ডলীর"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-032
+    text: "লোকটি একজন ভন্ড সাধু।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ভন্ড"
+    right: "ভণ্ড"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-033
+    text: "সন্ধ্যায় ঘরে লন্ঠন জ্বালানো হলো।"
+    error_class: NOTVA_SHOTVA
+    wrong: "লন্ঠন"
+    right: "লণ্ঠন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-034
+    text: "গ্রামের ভান্ডারে ধান জমা রাখা হয়।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ভান্ডারে"
+    right: "ভাণ্ডারে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-035
+    text: "পুরো ঘটনাটি একটি বড় কেলেঙ্কারি, রীতিমতো অঘটন ও চন্ডালকান্ড।"
+    error_class: NOTVA_SHOTVA
+    wrong: "চন্ডালকান্ড"
+    right: "চণ্ডালকাণ্ড"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- ষত্ব
+  - id: ns-036
+    text: "মানুস সমাজবদ্ধ জীব।"
+    error_class: NOTVA_SHOTVA
+    wrong: "মানুস"
+    right: "মানুষ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-037
+    text: "বৃস্টি নামল সন্ধ্যাবেলায়।"
+    error_class: NOTVA_SHOTVA
+    wrong: "বৃস্টি"
+    right: "বৃষ্টি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-038
+    text: "তার দৃস্টি অত্যন্ত প্রখর।"
+    error_class: NOTVA_SHOTVA
+    wrong: "দৃস্টি"
+    right: "দৃষ্টি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-039
+    text: "ঈশ্বর এই জগৎ সৃস্টি করেছেন।"
+    error_class: NOTVA_SHOTVA
+    wrong: "সৃস্টি"
+    right: "সৃষ্টি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-040
+    text: "এদেশের অর্থনীতি মূলত কৃসির উপর নির্ভরশীল।"
+    error_class: NOTVA_SHOTVA
+    wrong: "কৃসির"
+    right: "কৃষির"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-041
+    text: "এখানে ধূমপান নিসেধ।"
+    error_class: NOTVA_SHOTVA
+    wrong: "নিসেধ"
+    right: "নিষেধ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-042
+    text: "শ্রমিকদের উপর শোসন বন্ধ হওয়া উচিত।"
+    error_class: NOTVA_SHOTVA
+    wrong: "শোসন"
+    right: "শোষণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-043
+    text: "এই বিসয়ে আমার কোনো আপত্তি নেই।"
+    error_class: NOTVA_SHOTVA
+    wrong: "বিসয়ে"
+    right: "বিষয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-044
+    text: "সে কোনো দোস করেনি।"
+    error_class: NOTVA_SHOTVA
+    wrong: "দোস"
+    right: "দোষ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-045
+    text: "নারী ও পুরুস উভয়েরই সমান অধিকার।"
+    error_class: NOTVA_SHOTVA
+    wrong: "পুরুস"
+    right: "পুরুষ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-046
+    text: "গ্রীষ্মের পরে বর্সা আসে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "বর্সা"
+    right: "বর্ষা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-047
+    text: "এই কাজটি বিসেস গুরুত্ব বহন করে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "বিসেস"
+    right: "বিশেষ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-048
+    text: "রাজার গলায় মূল্যবান ভুসণ শোভা পাচ্ছিল।"
+    error_class: NOTVA_SHOTVA
+    wrong: "ভুসণ"
+    right: "ভূষণ"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-049
+    text: "তার কথায় আমি খুব তুস্ট হয়েছি।"
+    error_class: NOTVA_SHOTVA
+    wrong: "তুস্ট"
+    right: "তুষ্ট"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ns-050
+    text: "পাহাড়ের চূড়ায় তুসার জমে আছে।"
+    error_class: NOTVA_SHOTVA
+    wrong: "তুসার"
+    right: "তুষার"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored

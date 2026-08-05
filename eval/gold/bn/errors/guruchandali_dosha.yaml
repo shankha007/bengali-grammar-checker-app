@@ -1,0 +1,387 @@
+# GURUCHANDALI_DOSHA — গুরুচণ্ডালী দোষ
+#
+# সাধু and চলিত forms mixed inside ONE sentence. The flagship feature.
+#
+# Contrast with clean.yaml, which holds sentences written consistently in each
+# register — those are correct prose and flagging them is the failure mode this
+# class must avoid. A সাধু sentence is not an error; a সাধু word in a চলিত
+# sentence is.
+#
+# Across sentences rather than within one, this is REGISTER_INCONSISTENCY —
+# a different class with a different threshold.
+#
+# review: model — see eval/gold/README.md.
+
+cases:
+  # --- সাধু pronoun in a চলিত sentence
+  - id: gd-001
+    text: "সে তাহার বইটা পড়ছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "তাহার"
+    right: "তার"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-002
+    text: "ইহা আমার বই এবং ওটা তোমার।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "ইহা"
+    right: "এটা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-003
+    text: "আমি তাহাকে কাল দেখেছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "তাহাকে"
+    right: "তাকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-004
+    text: "যাহা বলছ তা ঠিক নয়।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "যাহা"
+    right: "যা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-005
+    text: "উহা দেখে আমি অবাক হয়েছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "উহা"
+    right: "ওটা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-006
+    text: "তাহারা গতকাল বাড়ি ফিরেছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "তাহারা"
+    right: "তারা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-007
+    text: "ইহার কোনো মানে হয় না বলে আমি মনে করছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "ইহার"
+    right: "এর"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-008
+    text: "যাহার কথা বলছিলে সে আজ এসেছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "যাহার"
+    right: "যার"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- সাধু verb in a চলিত sentence
+  - id: gd-009
+    text: "আমরা করিয়াছি এবং এখন বাড়ি যাচ্ছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "করিয়াছি"
+    right: "করেছি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-010
+    text: "তিনি বাজারে গিয়া দুটো আম কিনেছেন।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "গিয়া"
+    right: "গিয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-011
+    text: "সে বলিয়া চলে গেছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "বলিয়া"
+    right: "বলে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-012
+    text: "আমি দেখিয়া অবাক হয়েছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "দেখিয়া"
+    right: "দেখে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-013
+    text: "তারা বসিয়া অপেক্ষা করছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "বসিয়া"
+    right: "বসে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-014
+    text: "সে শুনিয়া খুব খুশি হয়েছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "শুনিয়া"
+    right: "শুনে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-015
+    text: "আমরা খাইয়া বেরিয়ে পড়ছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "খাইয়া"
+    right: "খেয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-016
+    text: "তিনি লইয়া চলে গিয়েছেন।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "লইয়া"
+    right: "নিয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-017
+    text: "সে বইটি পড়িয়া ফেলেছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "পড়িয়া"
+    right: "পড়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-018
+    text: "আমরা সেখানে থাকিয়া কাজ করছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "থাকিয়া"
+    right: "থেকে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-019
+    text: "সে আসিয়া আমাকে খবরটা দিয়েছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "আসিয়া"
+    right: "এসে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-020
+    text: "তিনি চাহিয়া রইলেন এবং কিছু বলছেন না।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "চাহিয়া"
+    right: "চেয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- সাধু finite verb in a চলিত sentence
+  - id: gd-021
+    text: "সে বলিল যে আজ আসছে না।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "বলিল"
+    right: "বলল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-022
+    text: "তিনি কহিলেন কথাটা, আর আমরা শুনছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "কহিলেন"
+    right: "বললেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-023
+    text: "কাজটি হইল, এখন আমরা যাচ্ছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "হইল"
+    right: "হলো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-024
+    text: "সে করিল কাজটা, কিন্তু ফল পাচ্ছে না।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "করিল"
+    right: "করল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-025
+    text: "সে করিয়াছে, তাই আমরা আর করছি না।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "করিয়াছে"
+    right: "করেছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-026
+    text: "তিনি গিয়াছে বলে শুনেছি, এখন ফিরছেন।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "গিয়াছে"
+    right: "গেছেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-027
+    text: "বইটি সে দিয়াছে, আমি নিচ্ছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "দিয়াছে"
+    right: "দিয়েছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-028
+    text: "কাজটি হইতে অনেক সময় লাগছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "হইতে"
+    right: "হতে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-029
+    text: "সেখানে যাইতে আমার ভালো লাগছে না।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "যাইতে"
+    right: "যেতে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-030
+    text: "সে হইয়া গেছে ডাক্তার, এখন রোগী দেখছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "হইয়া"
+    right: "হয়ে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-031
+    text: "মোদের দেশ সুন্দর, আমরা একে ভালোবাসছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "মোদের"
+    right: "আমাদের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-032
+    text: "আমাদিগের কর্তব্য আমরা পালন করছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "আমাদিগের"
+    right: "আমাদের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-033
+    text: "তোমাদিগকে আমি সব বলে দিয়েছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "তোমাদিগকে"
+    right: "তোমাদের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-034
+    text: "সে রহিল সেখানে, আর আমরা ফিরে আসছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "রহিল"
+    right: "রইল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: gd-035
+    text: "তাহা শুনে আমি অবাক হচ্ছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "তাহা"
+    right: "তা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- সাধু honorific (-েন) in a চলিত sentence.
+  #
+  # Everything above this line is a শাধু form the detector already knew. These
+  # were added after testing the checker on prose it had never seen: the whole
+  # honorific column was being labelled চলিত, because গিয়াছেন ends in "ছেন".
+  # Thirty-five gold cases scored 1.000 recall while the detector was blind to
+  # an entire paradigm — the gap was in the sample, not in the metric.
+  - id: gd-036
+    text: "তিনি বাড়ি গিয়াছেন এবং এখন খাচ্ছেন।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "গিয়াছেন"
+    right: "গেছেন"
+    review: model
+    source: model-authored
+  - id: gd-037
+    text: "তিনি আসিয়াছেন, আমরা তাঁকে দেখছি।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "আসিয়াছেন"
+    right: "এসেছেন"
+    review: model
+    source: model-authored
+  - id: gd-038
+    text: "শিক্ষক বলিয়াছেন যে পরীক্ষা কাল হচ্ছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "বলিয়াছেন"
+    right: "বলেছেন"
+    review: model
+    source: model-authored
+  - id: gd-039
+    text: "তিনি খাইতেছিলেন যখন আমি ঘরে ঢুকলাম।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "খাইতেছিলেন"
+    right: "খাচ্ছিলেন"
+    review: model
+    source: model-authored
+  - id: gd-040
+    text: "মা রান্না করিতেছিলেন আর আমরা অপেক্ষা করছিলাম।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "করিতেছিলেন"
+    right: "করছিলেন"
+    review: model
+    source: model-authored
+
+  # --- চলিত future beside a সাধু verb.
+  #
+  # These sentences carried a সাধু marker and nothing to clash with, because
+  # যাবে / করবেন / আসবে were not markers at all. Future tense is where a writer
+  # drifting between registers is most likely to be caught, which made this the
+  # widest hole in the detector.
+  - id: gd-041
+    text: "লোকটি কহিল সে কাল যাবে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "কহিল"
+    right: "বলল"
+    review: model
+    source: model-authored
+  - id: gd-042
+    text: "তিনি বলিলেন যে তিনি কাল আসবেন।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "বলিলেন"
+    right: "বললেন"
+    review: model
+    source: model-authored
+  - id: gd-043
+    text: "যাহা বলিবার সে বলবে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "যাহা"
+    right: "যা"
+    review: model
+    source: model-authored
+  - id: gd-044
+    text: "সে করিয়া দেবে বলেছে।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "করিয়া"
+    right: "করে"
+    review: model
+    source: model-authored
+  # The minority register is what gets flagged, so in a সাধু sentence it is the
+  # চলিত verb that is the error — the reverse of every case above it.
+  - id: gd-045
+    text: "তিনি ইহা দেখিবেন এবং পরে জানাবেন।"
+    error_class: GURUCHANDALI_DOSHA
+    wrong: "জানাবেন"
+    right: "জানাইবেন"
+    review: model
+    source: model-authored

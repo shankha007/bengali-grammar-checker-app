@@ -1,0 +1,114 @@
+# Supplement to the Hunspell dictionary: correct Bengali that bn_BD rejects.
+#
+# Every shipping spell-checker carries one of these. The entries here were found
+# by running the bundled seed lexicon and the clean gold slice through bn_BD and
+# reviewing what it rejected - not by patching whatever the eval happened to
+# flag. Two systematic gaps showed up:
+#
+#   1. চলিত future-tense forms (করব, থাকবে, দেখব, পারব)
+#   2. সাধু finite forms (দিয়াছে, যাহার, আমাদিগের)
+#
+# A word added here will never be flagged as NON_WORD, so the bar is "a careful
+# editor would not change this", not "I have seen it written somewhere".
+#
+# Do NOT add a word merely because it appears in the gold set. If the eval
+# disagrees with the dictionary, decide which one is wrong first.
+
+# --- চলিত future / habitual forms missing from bn_BD
+করব
+করবে
+করবেন
+থাকব
+থাকবে
+দেখব
+দেখবে
+পারব
+পারবে
+যাব
+যাবে
+বলব
+বলবে
+লিখব
+নেব
+দেব
+শোনে
+
+# --- সাধু finite forms missing from bn_BD
+দিয়াছে
+দিয়াছি
+যাহার
+যাহাকে
+আমাদিগের
+তোমাদিগকে
+তাহাদিগের
+কিনিলেন
+কহিলেন
+বসিলেন
+আসিলেন
+
+# --- তৎসম words absent from bn_BD.
+# তীক্ষ্ণ is the correct spelling - the ণত্ব-বিধান requires ণ after ক্ষ. bn_BD
+# offers তীক্ষ্ন (with ন) instead, which is the error, not the correction.
+তীক্ষ্ণ
+তীক্ষ্ণতা
+
+# --- accepted variant spellings
+পুরনো
+ভালবাসা
+
+# --- তৎসম forms with ট-বর্গ conjuncts that bn_BD lacks.
+# Found by scripts/validate_gold.py: the ণত্ব-বিধান requires ণ before ট ঠ ড ঢ in
+# তৎসম words, and bn_BD carries the ন-spellings but not always the ণ-spellings.
+লণ্ঠন
+ভাণ্ডার
+ভাণ্ডারে
+চণ্ডাল
+কাণ্ড
+চণ্ডালকাণ্ড
+
+# --- তুই-grade verb forms (2nd person intimate) missing from bn_BD
+আসবি
+যাবি
+করবি
+বলবি
+খাবি
+দেখবি
+
+# --- converb forms with stem vowel alternation, which no affix rule recovers.
+# কেনা -> কিনে, দেওয়া -> দিয়ে: the stem vowel changes, so stripping a suffix
+# from the surface form never reaches the dictionary entry.
+কিনে
+কিনি
+কিনছে
+কিনেছে
+
+# --- everyday nouns bn_BD does not have.
+#
+# শাড়ি was the find that prompted this section: the dictionary rejects it while
+# accepting শারি (a rare word for a caged bird / a row), so "শারি পড়ে" — a
+# double error — came back clean and the correct spelling would have been
+# flagged instead. When a checker's dictionary is wrong in this direction it is
+# worse than no checker.
+শাড়ি
+শাড়িটি
+শাড়িতে
+ওড়না
+পাঞ্জাবি
+জুতো
+
+# --- more চলিত future forms bn_BD rejects.
+#
+# Found the same way as the block above: "আমি বই পড়ব।" — as ordinary a sentence
+# as Bengali has — was flagged NON_WORD and offered ওড়ব. The dictionary covers
+# করব and পারব but not পড়ব, রাখব or উঠব, and a checker that corrects correct
+# writing is worse than one that misses errors.
+পড়ব
+পড়বে
+পড়বি
+রাখব
+রাখবে
+রাখবি
+লিখবি
+উঠব
+উঠবে
+উঠবি

@@ -1,0 +1,111 @@
+# Bengali affix inventory used for lexicon lookup, NOT for correctness judgement.
+#
+# Purpose is recall: বইগুলোকেও must resolve to বই so it is never flagged as a
+# non-word. Whether a given suffix is *appropriate* here is a CASE_MARKER /
+# CLASSIFIER question answered at Stage 2 (Phase 2), not a spelling question.
+#
+# Consequence, stated plainly: over-generous stripping lowers false positives and
+# raises false negatives. Given spec §8 weights F0.5 (precision-heavy) and calls
+# the clean-text false-positive rate the most important number in the project,
+# that trade is the correct direction. `make eval` reports both sides so the
+# choice stays visible rather than assumed.
+
+# Productive prefixes. Bengali compounds these freely with a following noun and
+# bn_BD lists only a fraction of the results: এদেশ, এবার, সবসময়, প্রতিদিন are
+# ordinary words that a stem-based dictionary misses. Stripping a prefix and
+# re-checking the remainder recovers them without listing every compound.
+#
+# Closed list on purpose. A general "try splitting anywhere" rule would accept
+# almost any string and destroy NON_WORD recall.
+prefixes:
+  - "এ"
+  - "ও"
+  - "সে"
+  - "সব"
+  - "প্রতি"
+  - "উপ"
+  - "অ"
+  - "অন"
+  - "নি"
+  - "সু"
+  - "দুর"
+  - "পুনঃ"
+  - "আধা"
+
+suffixes:
+  # বিভক্তি - case markers
+  case:
+    - "কে"
+    - "রে"
+    - "র"
+    - "এর"
+    - "য়ের"
+    - "ের"
+    - "তে"
+    - "েতে"
+    - "য়"
+    - "য়ে"
+    - "ে"
+
+  # plural / collective
+  plural:
+    - "রা"
+    - "েরা"
+    - "গুলো"
+    - "গুলি"
+    - "গুলা"
+    - "দের"
+    - "দিগের"
+    - "দিগকে"
+    - "গণ"
+    - "বৃন্দ"
+    - "সমূহ"
+
+  # classifiers - number/animacy agreement lives at Stage 2
+  classifier:
+    - "টা"
+    - "টি"
+    - "টে"
+    - "খানা"
+    - "খানি"
+    - "টুকু"
+    - "টুক"
+
+  # enclitics - outermost layer, stripped first by longest-match
+  enclitic:
+    - "ও"
+    - "ই"
+    - "তো"
+
+  # verb inflection - person/tense/honorific. Deliberately partial: this list
+  # exists to stop false NON_WORD flags on common finite forms, not to model
+  # Bengali conjugation. The real morphology lands with the analyser in Phase 4.
+  verb:
+    - "ছিলাম"
+    - "ছিলেন"
+    - "ছিলে"
+    - "ছিল"
+    - "ছেন"
+    - "ছিস"
+    - "ছি"
+    - "ছে"
+    - "তাম"
+    - "তেন"
+    - "তিস"
+    - "লাম"
+    - "লেন"
+    - "লে"
+    - "লো"
+    - "ল"
+    - "বেন"
+    - "বে"
+    - "বি"
+    - "ব"
+    - "ইয়া"
+    - "িয়া"
+    - "য়া"
+    - "ইতে"
+    - "িতে"
+    - "েছে"
+    - "েছি"
+    - "েছেন"

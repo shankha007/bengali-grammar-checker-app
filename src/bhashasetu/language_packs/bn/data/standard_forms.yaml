@@ -1,0 +1,77 @@
+# প্রমিত লেখ্য রূপ — colloquial and non-standard forms with a standard written
+# equivalent.
+#
+#     আমি কালকে বাজারে যাবো না।  →  আমি কাল বাজারে যাব না।
+#
+# TAXONOMY NOTE, because this is a genuine squeeze and hiding it would be worse.
+#
+# None of the 12 classes in spec §3 is about কথ্য-vs-লেখ্য. NON_WORD is the
+# closest — it already cites বাংলা একাডেমি প্রমিত বানানরীতি, which is exactly the
+# authority that prescribes যাব over যাবো — but its usual explanation says the
+# word is not in the lexicon, and যাবো and কালকে both are. So these edits carry
+# their own explanation, supplied here rather than in code: core/error_classes.py
+# requires that a language-specific message live in the language pack.
+#
+# The alternative was inventing a 13th class. core/types.py says the enum is
+# closed and that cross-language comparability of the eval slices depends on it,
+# so that is a spec change, not a data change.
+#
+# SCOPE. Only forms where the standard is not in dispute:
+#
+#   -বো → -ব   বাংলা একাডেমি prescribes the short form for the first-person
+#              future. Widely written with ো, which is why it is worth flagging;
+#              never *wrong* enough for high confidence, which is why it is 0.62
+#              and sits just above the surfacing threshold.
+#   কালকে/আজকে → কাল/আজ   the -কে here is colloquial, not the object case.
+#
+# Deliberately absent: -ল/-লো (করল/করলো) past forms, where usage genuinely
+# splits between Bangladesh and West Bengal standards, and টা/টি as a general
+# colloquialism, which is ordinary Bengali and not an error at all.
+
+explanation_native: "প্রমিত লেখ্য রূপ “{right}”; “{wrong}” কথ্য বা অপ্রমিত রূপ।"
+explanation_en: "“{right}” is the standard written form; “{wrong}” is colloquial or non-standard."
+rule_reference: "বাংলা একাডেমি প্রমিত বানানরীতি"
+
+detection:
+  confidence: 0.62
+
+forms:
+  # first-person future: -বো → -ব
+  - wrong: "যাবো"
+    right: "যাব"
+  - wrong: "করবো"
+    right: "করব"
+  - wrong: "খাবো"
+    right: "খাব"
+  - wrong: "বলবো"
+    right: "বলব"
+  - wrong: "দেখবো"
+    right: "দেখব"
+  - wrong: "শুনবো"
+    right: "শুনব"
+  - wrong: "পড়বো"
+    right: "পড়ব"
+  - wrong: "লিখবো"
+    right: "লিখব"
+  - wrong: "থাকবো"
+    right: "থাকব"
+  - wrong: "আসবো"
+    right: "আসব"
+  - wrong: "নেবো"
+    right: "নেব"
+  - wrong: "দেবো"
+    right: "দেব"
+  - wrong: "হবো"
+    right: "হব"
+  - wrong: "পাবো"
+    right: "পাব"
+  - wrong: "রাখবো"
+    right: "রাখব"
+  # colloquial adverbs
+  - wrong: "কালকে"
+    right: "কাল"
+    note: "the -কে is colloquial here, not the object case marker"
+  - wrong: "আজকে"
+    right: "আজ"
+  - wrong: "পরশুকে"
+    right: "পরশু"

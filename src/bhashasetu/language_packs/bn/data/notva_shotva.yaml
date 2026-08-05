@@ -1,0 +1,270 @@
+# ণত্ব-বিধান ও ষত্ব-বিধান
+#
+# CRITICAL SCOPE RULE, and the thing naive implementations get wrong:
+# both বিধান apply to **তৎসম** words only. তদ্ভব, দেশি, and বিদেশি words keep ন
+# and স. So ভাণ্ডার (তৎসম) takes ণ while ঠান্ডা (দেশি) takes ন, and a checker
+# that applies the cluster rule blindly "corrects" ঠান্ডা into a misspelling.
+#
+# Phase 1 therefore does NOT run the generative rules as detectors. It runs the
+# explicit `violations` list, where each entry is a specific word whose correct
+# তৎসম spelling is not in dispute. The generative rules are recorded here as
+# documentation and as Stage-2 training features (Phase 2), where a model that
+# actually knows a word's origin can apply them.
+#
+# Anything with a plausible second reading is deliberately absent. Notes on the
+# near-misses are kept inline so nobody "helpfully" adds them back.
+
+violations:
+  # --- ণত্ব: ঋ, র, ষ trigger ণ in the following syllable
+  - wrong: "কারন"
+    right: "কারণ"
+    rule: "ণত্ব-বিধান §2"
+    note: "র triggers ণ"
+  - wrong: "প্রমান"
+    right: "প্রমাণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "ব্যাকরন"
+    right: "ব্যাকরণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "বর্ননা"
+    right: "বর্ণনা"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "স্মরন"
+    right: "স্মরণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "মরন"
+    right: "মরণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "ধারনা"
+    right: "ধারণা"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "রামায়ন"
+    right: "রামায়ণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "ব্রাহ্মন"
+    right: "ব্রাহ্মণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "তৃন"
+    right: "তৃণ"
+    rule: "ণত্ব-বিধান §1"
+    note: "ঋ-কার triggers ণ"
+  - wrong: "ঋন"
+    right: "ঋণ"
+    rule: "ণত্ব-বিধান §1"
+  - wrong: "লক্ষন"
+    right: "লক্ষণ"
+    rule: "ণত্ব-বিধান §3"
+    note: "ষ (in ক্ষ) triggers ণ"
+  - wrong: "শ্রবন"
+    right: "শ্রবণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "কৃষ্ন"
+    right: "কৃষ্ণ"
+    rule: "ণত্ব-বিধান §3"
+  - wrong: "বিষ্নু"
+    right: "বিষ্ণু"
+    rule: "ণত্ব-বিধান §3"
+  - wrong: "অর্নব"
+    right: "অর্ণব"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "হরিন"
+    right: "হরিণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "আকর্সন"
+    right: "আকর্ষণ"
+    rule: "ণত্ব-বিধান §2"
+
+  # --- ণত্ব: ট-বর্গের পূর্বে ণ (তৎসম only)
+  - wrong: "ঘন্টা"
+    right: "ঘণ্টা"
+    rule: "ণত্ব-বিধান §4"
+    note: "ট-বর্গের আগে ণ"
+  - wrong: "পন্ডিত"
+    right: "পণ্ডিত"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "খন্ড"
+    right: "খণ্ড"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "কান্ড"
+    right: "কাণ্ড"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "দন্ড"
+    right: "দণ্ড"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "মন্ডল"
+    right: "মণ্ডল"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "ভন্ড"
+    right: "ভণ্ড"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "লন্ঠন"
+    right: "লণ্ঠন"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "ভান্ডার"
+    right: "ভাণ্ডার"
+    rule: "ণত্ব-বিধান §4"
+
+  # --- ষত্ব
+  - wrong: "বিশেস"
+    right: "বিশেষ"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "দোস"
+    right: "দোষ"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "মানুস"
+    right: "মানুষ"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "পুরুস"
+    right: "পুরুষ"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "বৃস্টি"
+    right: "বৃষ্টি"
+    rule: "ষত্ব-বিধান §2"
+    note: "ট-বর্গের আগে ষ"
+  - wrong: "দৃস্টি"
+    right: "দৃষ্টি"
+    rule: "ষত্ব-বিধান §2"
+  - wrong: "সৃস্টি"
+    right: "সৃষ্টি"
+    rule: "ষত্ব-বিধান §2"
+  - wrong: "কৃসি"
+    right: "কৃষি"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "নিসেধ"
+    right: "নিষেধ"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "ভুসণ"
+    right: "ভূষণ"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "সোসণ"
+    right: "শোষণ"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "বর্সা"
+    right: "বর্ষা"
+    rule: "ষত্ব-বিধান §1"
+
+  # --- second pass.
+  #
+  # Every word below was already being *corrected* — the lexicon rejects it and
+  # the suggester ranks the right form first — but as NON_WORD, which tells the
+  # user "not a word" and stops there. They are তৎসম words failing a specific
+  # বিধান, and the whole promise of this feature is that it names the clause.
+  # Being in this list is what upgrades the flag from a red squiggle to
+  # "ণত্ব-বিধান §2 says র is followed by ণ".
+  - wrong: "উদাহরন"
+    right: "উদাহরণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "সাধারন"
+    right: "সাধারণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "কারনে"
+    right: "কারণে"
+    rule: "ণত্ব-বিধান §2"
+    note: "inflected কারণ; the bare form is above"
+  - wrong: "চরন"
+    right: "চরণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "স্মরনীয়"
+    right: "স্মরণীয়"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "ব্যাকরনে"
+    right: "ব্যাকরণে"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "পরিনতি"
+    right: "পরিণতি"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "পরিনাম"
+    right: "পরিণাম"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "নির্নয়"
+    right: "নির্ণয়"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "বর্ন"
+    right: "বর্ণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "সম্পূর্ন"
+    right: "সম্পূর্ণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "পূর্ন"
+    right: "পূর্ণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "স্বর্ন"
+    right: "স্বর্ণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "কর্ন"
+    right: "কর্ণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "বিশেষন"
+    right: "বিশেষণ"
+    rule: "ণত্ব-বিধান §3"
+    note: "ষ triggers ণ"
+  - wrong: "বিশ্লেষন"
+    right: "বিশ্লেষণ"
+    rule: "ণত্ব-বিধান §3"
+  - wrong: "ভাষন"
+    right: "ভাষণ"
+    rule: "ণত্ব-বিধান §3"
+  - wrong: "পোষন"
+    right: "পোষণ"
+    rule: "ণত্ব-বিধান §3"
+  - wrong: "ঘোষনা"
+    right: "ঘোষণা"
+    rule: "ণত্ব-বিধান §3"
+  - wrong: "গ্রহন"
+    right: "গ্রহণ"
+    rule: "ণত্ব-বিধান §2"
+  - wrong: "ক্ষন"
+    right: "ক্ষণ"
+    rule: "ণত্ব-বিধান §3"
+  - wrong: "মন্ডপ"
+    right: "মণ্ডপ"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "কন্ঠ"
+    right: "কণ্ঠ"
+    rule: "ণত্ব-বিধান §4"
+  - wrong: "প্রসংসা"
+    right: "প্রশংসা"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "সন্তোস"
+    right: "সন্তোষ"
+    rule: "ষত্ব-বিধান §1"
+  - wrong: "বিসয়"
+    right: "বিষয়"
+    rule: "ষত্ব-বিধান §1"
+
+# Deliberately NOT in the list above - each has a legitimate second reading and
+# would generate false positives, which spec §8 treats as the worst outcome:
+#
+#   ভাসা   - "to float", a real word; only sometimes a misspelling of ভাষা
+#   পুরান  - colloquial "old"; only sometimes a misspelling of পুরাণ
+#   ঠান্ডা - দেশি, so the ট-বর্গ rule does not apply; ন is correct
+#   করন    - could be করণ (instrumental case) or a typo for করেন
+#   গুন    - গুণ is far commoner, but গুন (towing rope) exists
+#
+# These are exactly the cases the spec's research note describes LLMs failing on,
+# and exactly what Stage 2 with sentence context is for.
+
+# Generative rules: documentation + Phase 2 feature extractors. NOT run as
+# detectors in Phase 1.
+rules:
+  notva:
+    scope: "তৎসম only"
+    reference: "ণত্ব-বিধান"
+    description_bn: "ঋ, র, ষ-এর পরে এবং ট-বর্গের পূর্বে ন-এর স্থানে ণ হয়।"
+    description_en: >-
+      In তৎসম words, ন becomes ণ after ঋ/র/ষ (optionally across intervening
+      velars, labials, য, ব, হ, or a vowel) and before the retroflex series
+      ট ঠ ড ঢ.
+    triggers: ["ঋ", "ৃ", "র", "র্", "ষ"]
+    blockers: ["ত", "থ", "দ", "ধ", "ন", "ল", "স"]
+    cluster_targets: ["ট", "ঠ", "ড", "ঢ"]
+  shotva:
+    scope: "তৎসম only"
+    reference: "ষত্ব-বিধান"
+    description_bn: "অ, আ ছাড়া অন্য স্বরের পরে এবং ক, র-এর পরে স-এর স্থানে ষ হয়।"
+    description_en: >-
+      In তৎসম words, স becomes ষ after a vowel other than অ/আ, and after ক or র;
+      ষ also appears before ট and ঠ.
+    trigger_vowels: ["ই", "ঈ", "উ", "ঊ", "ঋ", "এ", "ঐ", "ও", "ঔ",
+                     "ি", "ী", "ু", "ূ", "ৃ", "ে", "ৈ", "ো", "ৌ"]
+    cluster_targets: ["ট", "ঠ"]

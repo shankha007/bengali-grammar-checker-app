@@ -1,0 +1,228 @@
+# AGREEMENT — অন্বয়-ভ্রম
+#
+# Number and animacy agreement between subject and verb. Bengali has no gender
+# agreement on verbs, so this class is narrower than its equivalent in most
+# European languages — the live distinctions are:
+#
+#   * animate vs inanimate subject selects আছে / আছেন and the honorific series
+#   * an inanimate plural does NOT take the honorific ending, however large
+#   * -রা marks animate plurals only; inanimate plurals take -গুলো
+#
+# Overlaps VERB_INFLECTION at the edges. The rule used here: if the error is the
+# subject's person/honorific grade, it is VERB_INFLECTION; if it is number or
+# animacy, it is AGREEMENT.
+#
+# No detector until Phase 2. review: model — see eval/gold/README.md.
+
+cases:
+  # --- honorific verb with an inanimate subject
+  - id: ag-001
+    text: "অনেক বই টেবিলে আছেন।"
+    error_class: AGREEMENT
+    wrong: "আছেন"
+    right: "আছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-002
+    text: "গাছগুলো অনেক বড় হয়েছেন।"
+    error_class: AGREEMENT
+    wrong: "হয়েছেন"
+    right: "হয়েছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-003
+    text: "নদীটি শুকিয়ে গেছেন।"
+    error_class: AGREEMENT
+    wrong: "গেছেন"
+    right: "গেছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-004
+    text: "বাড়িটি অনেক পুরনো হয়েছেন।"
+    error_class: AGREEMENT
+    wrong: "হয়েছেন"
+    right: "হয়েছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-005
+    text: "ফুলগুলো খুব সুন্দর ফুটেছেন।"
+    error_class: AGREEMENT
+    wrong: "ফুটেছেন"
+    right: "ফুটেছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-006
+    text: "গাড়িটি দ্রুত চলছেন।"
+    error_class: AGREEMENT
+    wrong: "চলছেন"
+    right: "চলছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- inconsistent agreement within one sentence
+  - id: ag-007
+    text: "ছেলেরা মাঠে খেলছেন এবং হাসছে।"
+    error_class: AGREEMENT
+    wrong: "খেলছেন"
+    right: "খেলছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-008
+    text: "তিনি এসে বসলেন এবং চা খেল।"
+    error_class: AGREEMENT
+    wrong: "খেল"
+    right: "খেলেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-009
+    text: "শিক্ষক ক্লাসে ঢুকলেন এবং পড়াতে শুরু করল।"
+    error_class: AGREEMENT
+    wrong: "করল"
+    right: "করলেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-010
+    text: "মেয়েটি এসেছিল এবং চলে গেলেন।"
+    error_class: AGREEMENT
+    wrong: "গেলেন"
+    right: "গেল"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- -রা on an inanimate noun
+  - id: ag-011
+    text: "বইরা টেবিলে রাখা আছে।"
+    error_class: AGREEMENT
+    wrong: "বইরা"
+    right: "বইগুলো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-012
+    text: "গাছরা বাতাসে দুলছে।"
+    error_class: AGREEMENT
+    wrong: "গাছরা"
+    right: "গাছগুলো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-013
+    text: "ঘরের চেয়াররা ভেঙে গেছে।"
+    error_class: AGREEMENT
+    wrong: "চেয়াররা"
+    right: "চেয়ারগুলো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-014
+    text: "পাথররা নদীর তলায় পড়ে আছে।"
+    error_class: AGREEMENT
+    wrong: "পাথররা"
+    right: "পাথরগুলো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- singular verb with a plural subject and vice versa
+  - id: ag-015
+    text: "ছাত্ররা সবাই পরীক্ষা দিয়েছি।"
+    error_class: AGREEMENT
+    wrong: "দিয়েছি"
+    right: "দিয়েছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-016
+    text: "আমরা সবাই মিলে কাজটি করেছে।"
+    error_class: AGREEMENT
+    wrong: "করেছে"
+    right: "করেছি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-017
+    text: "তারা দুজনেই সেখানে গিয়েছি।"
+    error_class: AGREEMENT
+    wrong: "গিয়েছি"
+    right: "গিয়েছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-018
+    text: "শ্রমিকেরা সারাদিন কাজ করেছি।"
+    error_class: AGREEMENT
+    wrong: "করেছি"
+    right: "করেছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- আছে / আছেন with animacy
+  - id: ag-019
+    text: "ঘরে তিনজন লোক আছে এবং একটি টেবিল আছেন।"
+    error_class: AGREEMENT
+    wrong: "আছেন"
+    right: "আছে"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-020
+    text: "সভায় প্রধান অতিথি আছে।"
+    error_class: AGREEMENT
+    wrong: "আছে"
+    right: "আছেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-021
+    text: "আমাদের বাড়িতে দাদু থাকে।"
+    error_class: AGREEMENT
+    wrong: "থাকে"
+    right: "থাকেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-022
+    text: "মন্ত্রী মহোদয় অনুষ্ঠানে উপস্থিত ছিল।"
+    error_class: AGREEMENT
+    wrong: "ছিল"
+    right: "ছিলেন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- possessive agreement
+  - id: ag-023
+    text: "ছেলেরা তার বই নিয়ে এসেছে।"
+    error_class: AGREEMENT
+    wrong: "তার"
+    right: "তাদের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-024
+    text: "আমরা আমার কাজ শেষ করেছি।"
+    error_class: AGREEMENT
+    wrong: "আমার"
+    right: "আমাদের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: ag-025
+    text: "তারা তার দায়িত্ব পালন করেনি।"
+    error_class: AGREEMENT
+    wrong: "তার"
+    right: "তাদের"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored

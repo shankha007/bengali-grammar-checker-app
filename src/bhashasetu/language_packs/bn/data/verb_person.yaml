@@ -1,0 +1,320 @@
+# পুরুষ ও সম্ভ্রমভেদে ক্রিয়ার রূপ — subject/verb person and honorific agreement.
+#
+# "আমি ভাত খাইবেন।" is wrong, and nothing in the checker said so. খাইবেন is the
+# honorific form; আমি takes খাইব. Bengali conjugates for person AND for
+# সম্ভ্রম (intimate তুই / familiar তুমি / honorific আপনি), and a mismatch is
+# one of the most common errors a learner or a hurried writer makes.
+#
+# WHY THIS IS STAGE 1 AND NOT PHASE 2
+#
+# The taxonomy files call VERB_INFLECTION a Phase-2 class, on the reasoning that
+# it needs a token classifier. That is true in general — the subject can be an
+# arbitrary noun phrase, and finding it is parsing. It is NOT true for the case
+# that actually shows up: a personal pronoun subject and a finite verb, both
+# drawn from closed sets, in one clause. That much is a table lookup, and the
+# table is below.
+#
+# Everything outside that shape is left to Phase 2 rather than guessed:
+#   - subjects that are noun phrases without a classifier suffix
+#   - sentences with more than one candidate subject (a পুরুষ mismatch cannot be
+#     asserted when it is not clear which subject a verb belongs to)
+#   - irregular stems not listed under `roots` (এসো, বোসো)
+#
+# PRECISION DEVICES, in the order they apply. Spec §8 makes false positives the
+# governing metric, and an agreement rule is the easiest place in this whole
+# codebase to generate them:
+#
+#   1. exactly one subject in the sentence, else skip entirely;
+#   2. only the clause the subject sits in is examined, so "আমি বললাম, তিনি
+#      আসবেন।" does not read আসবেন against আমি;
+#   3. only the LAST recognised verb form in that clause is judged, because
+#      Bengali puts the finite verb at the end and the earlier matches are
+#      participles — করে in "আমি কাজ করে এসেছি" is not a third-person verb;
+#   4. every ending match must sit on a known root, so ট্রেন is not read as an
+#      honorific verb and গাছ is not read as a second-person one.
+
+# --- subjects -------------------------------------------------------------
+# Nominative pronouns only. Oblique forms (তাকে, তার, আমাকে) are deliberately
+# absent: they are not subjects, and counting them would make sentence 2 of
+# every paragraph look like it had two subjects.
+subjects:
+  আমি: first
+  আমরা: first
+  মোরা: first
+  মুই: first
+  তুই: second_intimate
+  তোরা: second_intimate
+  তুমি: second_familiar
+  তোমরা: second_familiar
+  আপনি: second_honorific
+  আপনারা: second_honorific
+  সে: third_familiar
+  ও: third_familiar
+  এ: third_familiar
+  তারা: third_familiar
+  ওরা: third_familiar
+  এরা: third_familiar
+  তাহারা: third_familiar
+  তিনি: third_honorific
+  ইনি: third_honorific
+  উনি: third_honorific
+  তাঁরা: third_honorific
+  তাঁহারা: third_honorific
+
+# A noun carrying a classifier is a third-person subject, and not an honorific
+# one: ছেলেটি খেলছেন is wrong for the same reason সে খেলছেন is. Used ONLY when
+# the sentence contains no pronoun subject, so "আপনি এই বইটি পড়েছ" is still
+# judged against আপনি.
+#
+# The suffix alone is not enough, and the failure is ugly: বৃষ্টি and সৃষ্টি end
+# in টি with a long enough stem, so "বৃষ্টি নামলে…" acquired a subject named
+# "rain" and an agreement error to go with it. The word must ALSO look like a
+# noun with a classifier stuck on it rather than a word that merely ends that
+# way: the stem is in the lexicon and the whole word is not. ছেলে is a word and
+# ছেলেটি is not; বৃষ্টি is a word, so it is left alone.
+classifier_suffixes: ["টি", "টা", "গুলো", "গুলি"]
+classifier_min_stem: 2
+
+# --- clause segmentation --------------------------------------------------
+# The subject governs its own clause and no further. Everything after one of
+# these is a different predication and is not checked against this subject.
+clause_breaks: ["যে", "বলে", "এবং", "কিন্তু", "আর", "তাই", "যখন", "যদি",
+                "তারপর", "অথবা", "কারণ", "যাতে", "নাকি"]
+
+# Skipped when looking for the finite verb at the end of a clause — they follow
+# it: "আপনি এই বইটি পড়েছ কি?"
+final_particles: ["কি", "কী", "না", "তো", "নাকি", "কিনা"]
+
+# Verb-shaped words that are not verbs here. নিলাম is the killer: নি + লাম is a
+# perfect first-person past, and নিলাম is also the noun "auction", so
+# "সে বাজার থেকে ফল নিলাম বলে জানাল।" — correct prose — came back as a পুরুষ
+# error. এসব is এস + ব by the same accident.
+not_verbs: ["নিলাম", "এসব", "সব", "কিছু", "আলাদা", "সালাম"]
+
+# A verb candidate is skipped when the word before it is one of these: the two
+# together are a fixed phrase, not a predication. "দয়া করে" is "please", and
+# without this the করে in "আপনি দয়া করে এখানে বোসো।" is read as the sentence's
+# finite verb — third person, against a second-person-honorific subject, and a
+# confident flag on the wrong word.
+#
+# Just দয়া. শুরু করল and শেষ করেছি look similar but are genuine compound
+# verbs — করল really is the finite verb there — so blocking those heads would
+# trade a false positive for a missed detection.
+phrase_heads_before_verb: ["দয়া"]
+
+# Endings that exist in the paradigms below but must never be used to RECOGNISE
+# a verb, because each is homographic with something far commoner:
+#
+#     লে   conditional  — "বৃষ্টি নামলে…" is "if it rains", not "you descended"
+#     তে   infinitive   — "হাঁটতে বের হন" is "goes out to walk"
+#     ত    habitual 3rd — too short to survive contact with ordinary nouns
+#
+# They stay in the tables because generation still needs them: correcting
+# আপনি করলেন for তুমি has to be able to produce করলে.
+ambiguous_endings: ["লে", "তে", "ত"]
+
+# Endings that are only trusted when the word is the LAST thing in its clause.
+#
+# ে is both the third-person present (সে কাজ করে) and the conjunctive participle
+# (কাজ করে এলাম, "having done the work"). Position separates them: a finite verb
+# ends the clause, a participle has the real verb after it. Without this,
+# "আমি সন্ধ্যায় বাড়ি ফিরে এলাম।" reads ফিরে as third person, disagrees with
+# আমি, and reports an error in a correct sentence — which is exactly what it did
+# on four sentences of the gold corpus.
+clause_final_only_endings: ["ে", "ও"]
+
+# Animate nouns that are not people. They take the third-person familiar verb
+# like any thing does, but getting it wrong is a পুরুষ error rather than an
+# animacy one — কুকুরটি ডাকছেন is the honorific form on a dog, not a plural
+# disagreement. Used only to choose which class to report.
+animal_nouns: ["কুকুর", "বিড়াল", "পাখি", "গরু", "ছাগল", "ঘোড়া", "মাছ", "বাঘ", "হাতি"]
+
+# --- paradigms ------------------------------------------------------------
+# Each table is one tense/aspect, mapping person to its ending. They do double
+# duty: recognising the verb, and generating the correction — the suggestion is
+# the same stem carried across to the subject's column, so আপনি + যাচ্ছ becomes
+# যাচ্ছেন rather than a generic "fix the verb".
+#
+# Longest ending wins across all paradigms, which is what keeps েছি (perfect)
+# from being read as ছি (progressive).
+#
+# second_honorific and third_honorific are identical in every paradigm — that is
+# Bengali, not duplication: আপনি যাচ্ছেন and তিনি যাচ্ছেন.
+paradigms:
+  present_simple:
+    first: "ি"
+    second_intimate: "িস"
+    second_familiar: "ও"
+    second_honorific: "েন"
+    third_familiar: "ে"
+    third_honorific: "েন"
+  present_progressive:
+    first: "ছি"
+    second_intimate: "ছিস"
+    second_familiar: "ছ"
+    second_honorific: "ছেন"
+    third_familiar: "ছে"
+    third_honorific: "ছেন"
+  # Vowel-final roots again: যাই / যাস / যাও / যান / যায়. Without this table
+  # "তিনি সকালে অফিসে যায়।" has no recognisable verb at all, and "আমি বই পড়ে
+  # ঘুমাই।" falls back to the participle পড়ে and reports a false error.
+  present_simple_vowel:
+    first: "ই"
+    second_intimate: "স"
+    second_familiar: "ও"
+    second_honorific: "ন"
+    third_familiar: "য়"
+    third_honorific: "ন"
+  # Imperative. Only two cells exist — an imperative has no first person, and
+  # `correct_form` returning None for the missing ones is what stops the rule
+  # from inventing a form that does not exist.
+  # The intimate cell is the bare stem (কর, বোস) and is deliberately absent: an
+  # empty ending matches every word ever written.
+  imperative:
+    second_familiar: "ো"
+    second_honorific: "ুন"
+  # Vowel-final roots double the চ: করছি but যাচ্ছি, খাচ্ছি.
+  present_progressive_vowel:
+    first: "চ্ছি"
+    second_intimate: "চ্ছিস"
+    second_familiar: "চ্ছ"
+    second_honorific: "চ্ছেন"
+    third_familiar: "চ্ছে"
+    third_honorific: "চ্ছেন"
+  present_perfect:
+    first: "েছি"
+    second_intimate: "েছিস"
+    second_familiar: "েছ"
+    second_honorific: "েছেন"
+    third_familiar: "েছে"
+    third_honorific: "েছেন"
+  past_simple:
+    first: "লাম"
+    second_intimate: "লি"
+    second_familiar: "লে"
+    second_honorific: "লেন"
+    third_familiar: "ল"
+    third_honorific: "লেন"
+  past_habitual:
+    first: "তাম"
+    second_intimate: "তিস"
+    second_familiar: "তে"
+    second_honorific: "তেন"
+    third_familiar: "ত"
+    third_honorific: "তেন"
+  past_perfect:
+    first: "েছিলাম"
+    second_intimate: "েছিলি"
+    second_familiar: "েছিলে"
+    second_honorific: "েছিলেন"
+    third_familiar: "েছিল"
+    third_honorific: "েছিলেন"
+  future:
+    first: "ব"
+    second_intimate: "বি"
+    second_familiar: "বে"
+    second_honorific: "বেন"
+    third_familiar: "বে"
+    third_honorific: "বেন"
+  # সাধু. Kept as its own paradigm so a correction stays in the register the
+  # writer chose: আমি খাইবেন is corrected to খাইব, not to খাব. Fixing the
+  # পুরুষ error and silently modernising the prose are two different edits, and
+  # only one of them was asked for.
+  sadhu_future_vowel:
+    first: "ইব"
+    second_intimate: "ইবি"
+    second_familiar: "ইবে"
+    second_honorific: "ইবেন"
+    third_familiar: "ইবে"
+    third_honorific: "ইবেন"
+  sadhu_future:
+    first: "িব"
+    second_intimate: "িবি"
+    second_familiar: "িবে"
+    second_honorific: "িবেন"
+    third_familiar: "িবে"
+    third_honorific: "িবেন"
+  sadhu_present_progressive:
+    first: "িতেছি"
+    second_familiar: "িতেছ"
+    second_honorific: "িতেছেন"
+    third_familiar: "িতেছে"
+    third_honorific: "িতেছেন"
+  sadhu_perfect:
+    first: "িয়াছি"
+    second_familiar: "িয়াছ"
+    second_honorific: "িয়াছেন"
+    third_familiar: "িয়াছে"
+    third_honorific: "িয়াছেন"
+
+# --- roots ----------------------------------------------------------------
+# The guard that makes short endings safe. Without it "ট্রেন" ends in েন and
+# reads as an honorific verb, and "গাছ" ends in ছ and reads as second person.
+#
+# Irregular present/past stems are listed alongside the citation root, because
+# the paradigms above are suffix tables and cannot derive যা → গে: গেলেন is
+# গে + লেন. Anything not listed goes unchecked, which costs recall and never
+# costs precision.
+roots:
+  - "কর"
+  - "বল"
+  - "চল"
+  - "ধর"
+  - "পড়"
+  - "লিখ"
+  - "শুন"
+  - "শোন"
+  - "দেখ"
+  - "থাক"
+  - "রাখ"
+  - "ডাক"
+  - "খেল"
+  - "হাঁট"
+  - "বস"
+  - "ওঠ"
+  - "উঠ"
+  - "নাম"
+  - "কাট"
+  - "খুল"
+  - "বুঝ"
+  - "শিখ"
+  - "জান"
+  - "মান"
+  - "আন"
+  - "মার"
+  - "কিন"
+  - "ছাড়"
+  - "তোল"
+  - "ফির"
+  - "ঘুমা"
+  - "হাস"
+  - "কাঁদ"
+  # গা (to sing) is NOT here: গান is গা + ন by the honorific table, and গান is
+  # also the noun "song", so "সে গান গাইতে ভালোবাসে।" came back as an
+  # agreement error. One rare conjugation is not worth the commonest noun.
+  #
+  # vowel-final and irregular stems
+  - "যা"
+  - "খা"
+  - "আস"
+  - "পা"
+  - "দি"
+  - "নি"
+  - "হ"
+  - "গে"
+  - "এস"
+  - "খে"
+  - "দে"
+  - "নে"
+  - "পে"
+  - "রই"
+  - "কহ"
+  - "চাহ"
+  - "রহ"
+  - "লই"
+
+detection:
+  # High, but not as high as the explicit ণত্ব list. The subject is identified
+  # by a closed table rather than by parsing, so there is a residual class of
+  # sentences where the pronoun is not the subject of the verb we judged.
+  confidence: 0.86

@@ -1,0 +1,53 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local dev database
+bhashasetu.db
+bhashasetu.db-wal
+bhashasetu.db-shm
+
+# Third-party dictionaries: fetched by scripts/fetch_dictionaries.py, never
+# vendored - they carry their own licences.
+src/bhashasetu/language_packs/bn/data/hunspell/
+
+# Phase 2 model artefacts
+models/
+*.onnx
+*.safetensors
+
+# Phase 3
+node_modules/
+.next/
+
+.DS_Store
+.idea/
+.vscode/
+
+# Next.js build output
+frontend/.next/
+frontend/node_modules/
+frontend/tsconfig.tsbuildinfo
+
+# Per-machine tool permissions. launch.json IS tracked — it defines the dev
+# servers and every contributor wants the same ones — but settings.local.json
+# is one developer's allow-list and means nothing to anyone else.
+.claude/settings.local.json
+
+# Generated screenshots
+frontend/screenshots/
+
+# The source spec. A leading "./" does not match anything in a gitignore
+# pattern, so this file was in fact being tracked despite the intent to exclude
+# it — found when preparing the first push.
+bangla_grammar_checker_master_prompt.md

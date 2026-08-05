@@ -1,0 +1,227 @@
+# CLASSIFIER — পদাশ্রিত নির্দেশক
+#
+# Bengali numerals take a classifier that agrees with ANIMACY and, loosely, with
+# register:
+#
+#   জন    — human            (তিনজন ছাত্র)
+#   টা/টি — inanimate, count (তিনটি বই); টি is the more formal of the two
+#   খানা/খানি — flat or sheet-like things (একখানা কাগজ, একখানি চিঠি)
+#   গুলো/গুলি — plural definite; গুলি is the more formal
+#   টুকু  — mass / partitive (একটুকু জল)
+#
+# The commonest real error is জন with an inanimate noun or টি with a person.
+#
+# No detector until Phase 2. review: model — see eval/gold/README.md.
+
+cases:
+  # --- জন used with an inanimate noun
+  - id: cl-001
+    text: "তিনজন বই টেবিলের উপর রাখা আছে।"
+    error_class: CLASSIFIER
+    wrong: "তিনজন"
+    right: "তিনটি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-002
+    text: "আমি দুজন কলম কিনেছি।"
+    error_class: CLASSIFIER
+    wrong: "দুজন"
+    right: "দুটি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-003
+    text: "বাগানে পাঁচজন গাছ লাগানো হয়েছে।"
+    error_class: CLASSIFIER
+    wrong: "পাঁচজন"
+    right: "পাঁচটি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-004
+    text: "টেবিলে চারজন চেয়ার রয়েছে।"
+    error_class: CLASSIFIER
+    wrong: "চারজন"
+    right: "চারটি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-005
+    text: "সে দুজন আম খেয়েছে।"
+    error_class: CLASSIFIER
+    wrong: "দুজন"
+    right: "দুটি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- টা/টি used with a person
+  - id: cl-006
+    text: "দুটি ছাত্র ক্লাসে এসেছে।"
+    error_class: CLASSIFIER
+    wrong: "দুটি"
+    right: "দুজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-007
+    text: "সভায় তিনটি শিক্ষক উপস্থিত ছিলেন।"
+    error_class: CLASSIFIER
+    wrong: "তিনটি"
+    right: "তিনজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-008
+    text: "আমাদের পরিবারে পাঁচটি সদস্য আছে।"
+    error_class: CLASSIFIER
+    wrong: "পাঁচটি"
+    right: "পাঁচজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-009
+    text: "রাস্তায় দুটি লোক দাঁড়িয়ে আছে।"
+    error_class: CLASSIFIER
+    wrong: "দুটি"
+    right: "দুজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-010
+    text: "হাসপাতালে চারটি ডাক্তার কাজ করছেন।"
+    error_class: CLASSIFIER
+    wrong: "চারটি"
+    right: "চারজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- খানা / খানি misuse
+  - id: cl-011
+    text: "একখানা মানুষ দাঁড়িয়ে আছে।"
+    error_class: CLASSIFIER
+    wrong: "একখানা"
+    right: "একজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-012
+    text: "সে দুইখানা ছাত্রকে পড়ায়।"
+    error_class: CLASSIFIER
+    wrong: "দুইখানা"
+    right: "দুজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-013
+    text: "আমি একটি চিঠি লিখেছি তাকে, সঙ্গে পাঠিয়েছি একজন ছবি।"
+    error_class: CLASSIFIER
+    wrong: "একজন"
+    right: "একখানা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- গুলো / গুলি with number words
+  - id: cl-014
+    text: "তিনগুলো বই আমি পড়েছি।"
+    error_class: CLASSIFIER
+    wrong: "তিনগুলো"
+    right: "তিনটি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-015
+    text: "ছেলেগুলো নয়, ছেলেটিরা মাঠে খেলছে।"
+    error_class: CLASSIFIER
+    wrong: "ছেলেটিরা"
+    right: "ছেলেরা"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-016
+    text: "মানুষটিগুলো রাস্তায় দাঁড়িয়ে আছে।"
+    error_class: CLASSIFIER
+    wrong: "মানুষটিগুলো"
+    right: "মানুষগুলো"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- টুকু with a count noun
+  - id: cl-017
+    text: "সে একটুকু বই পড়েছে।"
+    error_class: CLASSIFIER
+    wrong: "একটুকু"
+    right: "একটি"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-018
+    text: "আমাকে একটি জল দাও।"
+    error_class: CLASSIFIER
+    wrong: "একটি"
+    right: "একটু"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-019
+    text: "সে দুটি চিনি চায়ে দিয়েছে।"
+    error_class: CLASSIFIER
+    wrong: "দুটি"
+    right: "একটু"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+
+  # --- double classifier / classifier on an already-plural noun
+  - id: cl-020
+    text: "অনেক ছাত্ররা পরীক্ষায় অংশ নিয়েছে।"
+    error_class: CLASSIFIER
+    wrong: "ছাত্ররা"
+    right: "ছাত্র"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-021
+    text: "সব বইগুলো টেবিলে রাখা আছে।"
+    error_class: CLASSIFIER
+    wrong: "বইগুলো"
+    right: "বই"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-022
+    text: "কয়েকটি লোকজন সেখানে জড়ো হয়েছিল।"
+    error_class: CLASSIFIER
+    wrong: "লোকজন"
+    right: "লোক"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-023
+    text: "প্রতিটি ছাত্ররা একটি করে বই পেয়েছে।"
+    error_class: CLASSIFIER
+    wrong: "ছাত্ররা"
+    right: "ছাত্র"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-024
+    text: "দশটি জন শ্রমিক কাজ করছে।"
+    error_class: CLASSIFIER
+    wrong: "দশটি জন"
+    right: "দশজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
+  - id: cl-025
+    text: "সে দুইটা জন বন্ধুকে ডেকেছে।"
+    error_class: CLASSIFIER
+    wrong: "দুইটা জন"
+    right: "দুজন"
+    review: human
+    reviewed_by: project-owner
+    source: model-authored
