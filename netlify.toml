@@ -1,0 +1,46 @@
+# Netlify — frontend only, with the API proxied to a Python host.
+#
+# READ THIS BEFORE USING IT. Netlify cannot run this app on its own. Netlify
+# Functions support JavaScript, TypeScript and Go; the checker is FastAPI plus a
+# Hunspell dictionary, so there is no runtime here that can execute it. Deployed
+# without a backend, this config gives you the UI and nothing behind it: every
+# /api call 404s and the editor never flags anything.
+#
+# So this is a two-host setup:
+#
+#   Netlify  →  the exported frontend, plus the proxy below
+#   Render / Hugging Face Spaces / Fly  →  the Dockerfile at the repo root
+#
+# If you would rather have one host and one thing to keep alive, use the
+# Dockerfile by itself — it serves both halves from a single port. See
+# DEPLOY.md. This file exists for the case where you specifically want the UI
+# on Netlify's CDN.
+#
+# WHY A PROXY RATHER THAN CALLING THE BACKEND DIRECTLY
+#
+# The rewrite below is a proxy (status 200, not 301), so the browser only ever
+# sees the Netlify origin. That is load-bearing: the anonymous device cookie is
+# httpOnly and first-party, and a cross-origin XHR to a different hostname would
+# have it dropped by default in most browsers — the identity would silently stop
+# persisting. It is the same reason `make web` proxies /api during development.
+
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "out"
+
+[build.environment]
+  # Switches next.config.ts to output: "export".
+  BHASHASETU_STATIC_EXPORT = "1"
+  NODE_VERSION = "22"
+
+# ---------------------------------------------------------------------------
+# SET THIS. Replace the host with wherever the Dockerfile is running. Netlify
+# does not interpolate environment variables into redirect targets, so it has to
+# be a literal — this is the one line you must edit by hand.
+# ---------------------------------------------------------------------------
+[[redirects]]
+  from = "/api/*"
+  to = "https://REPLACE-WITH-YOUR-BACKEND.onrender.com/api/:splat"
+  status = 200
+  force = true

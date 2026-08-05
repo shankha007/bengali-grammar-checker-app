@@ -10,6 +10,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from bhashasetu.core.protocols import (
     Detector,
     Lexicon,
@@ -56,3 +58,43 @@ def test_core_contains_no_bengali_codepoints() -> None:
         cwd=REPO,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_pack_survives_a_broken_dictionary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A dictionary that will not load must degrade the checker, not kill it.
+
+    The fallback used to catch RuntimeError only, which covered a missing spylls
+    and nothing else. A half-finished fetch — .dic written, .aff not — raised
+    FileNotFoundError out of spylls and took `get_pack("bn")` down with it. In a
+    container build that is a failed deploy whose log names spylls' internals
+    rather than the dictionary.
+
+    Parametrised over the ways a fetch can leave the directory wrong.
+    """
+    import bhashasetu.language_packs.bn.lexicon as lexicon_module
+
+    for name, files in (
+        ("aff missing", {"bn_BD.dic": "3\nfoo\nbar\n"}),
+        ("dic truncated", {"bn_BD.dic": "", "bn_BD.aff": "SET UTF-8\n"}),
+        ("both unreadable", {"bn_BD.dic": "\x00\x00", "bn_BD.aff": "\x00"}),
+    ):
+        data = tmp_path / name.replace(" ", "_")
+        (data / "hunspell").mkdir(parents=True)
+        for filename, body in files.items():
+            (data / "hunspell" / filename).write_text(body, encoding="utf-8")
+        for shared in ("lexicon.txt", "suffixes.yaml", "extra_words.txt"):
+            source = lexicon_module._DATA / shared
+            if source.exists():
+                (data / shared).write_bytes(source.read_bytes())
+
+        monkeypatch.setattr(lexicon_module, "_DATA", data)
+        lex = lexicon_module.load_default_lexicon()
+
+        assert lex.size > 0, f"{name}: no lexicon at all"
+        # Degraded, and said so — silence here would ship a checker that finds
+        # no spelling errors and looks healthy doing it.
+        assert "WARNING" in capsys.readouterr().err, f"{name}: fell back silently"

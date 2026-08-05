@@ -47,15 +47,32 @@ COPY eval/ eval/
 # pack falls back to the bundled seed list and damps unknown-word confidence
 # below the display threshold, so a network failure here costs spelling
 # detection rather than the whole deployment.
+# A half-finished fetch is worse than none: spylls needs the .aff and the .dic
+# together, and one without the other used to abort the pack load below with a
+# FileNotFoundError naming spylls' internals. Keep the pair or keep neither.
 RUN python scripts/fetch_dictionaries.py --yes || \
-    echo "WARNING: dictionary fetch failed; running on the seed lexicon"
+      echo "WARNING: dictionary fetch failed; running on the seed lexicon"; \
+    d=src/bhashasetu/language_packs/bn/data/hunspell; \
+    if [ -d "$d" ] && { [ ! -f "$d/bn_BD.dic" ] || [ ! -f "$d/bn_BD.aff" ]; }; then \
+      echo "WARNING: incomplete dictionary, discarding it"; rm -rf "$d"; \
+    fi
 
 COPY --from=web /web/out /app/web
 
 # Fail the build rather than ship a broken pack: a malformed error_classes.yaml
 # or a class that lost its gold cases is a build error, not a surprise on
 # someone's first request.
-RUN python -c "from bhashasetu.core.registry import get_pack; get_pack('bn')"
+#
+# Prints what it loaded, so a future failure here is diagnosable from the build
+# log alone — the bare `python -c` reported only "exit code: 1" and left you
+# reading a traceback out of context.
+RUN python -c "\
+import sys; \
+from bhashasetu.core.registry import get_pack; \
+pack = get_pack('bn'); \
+print(f'pack ok: {pack.code}, lexicon {pack.lexicon.size} words, ' \
+      f'{len(pack.detectors)} detector(s)'); \
+sys.exit(0)"
 
 # Hosts inject $PORT and expect the process to honour it. 8000 is the local
 # default so `docker run` behaves without extra flags.

@@ -18,6 +18,7 @@ suggestions rather than confident wrong ones. Ship a real Hunspell dictionary
 
 from __future__ import annotations
 
+import sys
 import unicodedata
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -30,6 +31,11 @@ from bhashasetu.language_packs.bn import chars as C
 from bhashasetu.language_packs.bn.phonetic import soundex
 
 _DATA = Path(__file__).parent / "data"
+
+# Sanity floor for a fetched Hunspell dictionary. bn_BD ships ~88k stems; a file
+# holding fewer than this parsed but did not download properly. See
+# HunspellLexicon.__init__ for why loading one anyway is dangerous.
+MIN_HUNSPELL_STEMS = 1_000
 
 # Below this many surface forms, NON_WORD flags are damped hard - the dictionary,
 # not the writer, is the likely problem.
@@ -178,6 +184,18 @@ class HunspellLexicon(BengaliLexicon):
                 "or fall back to the bundled seed lexicon"
             ) from exc
         self._dict = Dictionary.from_files(str(dic_path.with_suffix("")))
+        # A dictionary can parse cleanly and still be useless. A truncated
+        # download leaves a valid-looking .dic with almost no stems, and that
+        # does not fail — it produces a lexicon that rejects ordinary Bengali
+        # and flags every word as NON_WORD, which is the single worst thing this
+        # checker can do (spec §8). bn_BD ships ~88k stems; anything within an
+        # order of magnitude of nothing is a broken file, not a small dictionary.
+        stems = len(self._dict.dic.words)
+        if stems < MIN_HUNSPELL_STEMS:
+            raise ValueError(
+                f"{dic_path.name} parsed but holds only {stems} stems "
+                f"(expected >= {MIN_HUNSPELL_STEMS}); treating it as corrupt"
+            )
         # Union, not replacement. The seed list and data/extra_words.txt carry
         # সাধু forms and চলিত future tenses that bn_BD lacks; loading the real
         # dictionary must not throw them away, or installing a better dictionary
@@ -279,8 +297,26 @@ def load_default_lexicon() -> BengaliLexicon:
             lex = HunspellLexicon(
                 hunspell_dic, suffixes, supplement=[*words, *extra], prefixes=prefixes
             )
-        except RuntimeError:
-            pass
+        except Exception as exc:
+            # Broad on purpose. This used to catch RuntimeError only, which
+            # covered a missing spylls and nothing else — so a *half-fetched*
+            # dictionary took the whole pack down: .dic present, .aff missing,
+            # spylls raises FileNotFoundError, and `get_pack("bn")` dies. In a
+            # container build that is a failed deploy, and the message names
+            # spylls' internals rather than the dictionary.
+            #
+            # A dictionary that will not load is a degraded checker, never a
+            # dead one: the seed list below still runs, with unknown-word
+            # confidence damped under the display threshold. Say so loudly and
+            # carry on.
+            print(
+                f"WARNING: Hunspell dictionary at {hunspell_dic.parent} could not "
+                f"be loaded ({type(exc).__name__}: {exc}); falling back to the "
+                f"{len(words)}-word seed lexicon. Spelling errors will be "
+                "detected but held below the display threshold. "
+                "Re-run scripts/fetch_dictionaries.py --yes to repair it.",
+                file=sys.stderr,
+            )
         else:
             return lex
     return BengaliLexicon([*words, *extra], suffixes, freq, prefixes=prefixes)
