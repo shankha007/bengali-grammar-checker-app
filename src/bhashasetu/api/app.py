@@ -16,13 +16,17 @@ Design notes that matter for the editor:
 
 from __future__ import annotations
 
+import os
 import time
 from collections import defaultdict, deque
 from dataclasses import replace
+from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from bhashasetu import __version__
 from bhashasetu.api.models import (
@@ -272,7 +276,69 @@ def create_app() -> FastAPI:
         phrase, _secret_hash = generate_recovery_phrase()
         return RecoveryOut(phrase=phrase, words=len(phrase.split()))
 
+    _mount_web(app)
     return app
+
+
+def _web_dir() -> Path | None:
+    """The exported frontend, if one was built.
+
+    Set BHASHASETU_WEB_DIR to point at it explicitly; otherwise the repo layout
+    is assumed. Absent, the API serves only /api and the dev setup is unchanged
+    — `make web` still runs Next itself and proxies here.
+    """
+    override = os.environ.get("BHASHASETU_WEB_DIR")
+    candidate = (
+        Path(override)
+        if override
+        else Path(__file__).resolve().parents[3] / "frontend" / "out"
+    )
+    return candidate if candidate.is_dir() else None
+
+
+def _mount_web(app: FastAPI) -> None:
+    """Serve the exported frontend from this same app.
+
+    Free hosting gives you one process on one port, so in production the API
+    serves the UI as well and the browser sees a single origin. That is not
+    merely convenient: it is what keeps the httpOnly device cookie first-party,
+    which is the same reason the dev setup proxies /api through Next.
+
+    Registered last on purpose. FastAPI matches routes in declaration order, so
+    every /api route above wins before the catch-all below is consulted.
+    """
+    web = _web_dir()
+    if web is None:
+        return
+
+    # Hashed, immutable build output. Mounted rather than routed so Starlette
+    # handles ranges and conditional requests.
+    assets = web / "_next"
+    if assets.is_dir():
+        app.mount("/_next", StaticFiles(directory=assets), name="next-assets")
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def web_page(path: str) -> FileResponse:
+        # `next build` with output: "export" writes /editor as editor.html, not
+        # editor/index.html, so StaticFiles(html=True) alone would 404 on every
+        # route but the root. Try each shape the exporter can produce.
+        for candidate in (
+            web / path,
+            web / f"{path}.html",
+            web / path / "index.html",
+        ):
+            try:
+                resolved = candidate.resolve()
+                resolved.relative_to(web.resolve())  # no escaping the web root
+            except (OSError, ValueError):
+                continue
+            if resolved.is_file():
+                return FileResponse(resolved)
+
+        not_found = web / "404.html"
+        if not_found.is_file():
+            return FileResponse(not_found, status_code=404)
+        raise HTTPException(404, "not found")
 
 
 app = create_app()

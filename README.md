@@ -15,6 +15,7 @@ language pack, not the only one, and nothing Bengali-specific lives outside
 ## Contents
 
 - [Quick start](#quick-start)
+- [Deploying](#deploying)
 - [Commands](#commands)
 - [A user's first five minutes](#a-users-first-five-minutes)
 - [What it can do, with examples](#what-it-can-do-with-examples)
@@ -89,6 +90,27 @@ python -m bhashasetu.cli check "এর কারন কী কেউ জান�
 │ 3-7  │ কারন  │ কারণ        │ NOTVA_SHOTVA │ 0.93 │ 1 │
 └──────┴───────┴─────────────┴──────────────┴──────┴───┘
 ```
+
+---
+
+## Deploying
+
+One container: the frontend is exported to static HTML at build time and served
+by the FastAPI process, so a host only has to run one thing on one port.
+
+```bash
+docker build -t bhashasetu .
+docker run -p 8000:8000 -e PORT=8000 bhashasetu
+```
+
+[`render.yaml`](render.yaml) defines a free Render service pointing at the same
+Dockerfile. Step-by-step instructions, the environment variables, and what the
+free tier's sleep behaviour means for a shared link are in
+**[DEPLOY.md](DEPLOY.md)**.
+
+Local development is unaffected — `make api` + `make web` still run the two
+servers separately, and the static export only happens when the Docker build
+sets `BHASHASETU_STATIC_EXPORT=1`.
 
 ---
 

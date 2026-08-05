@@ -1,0 +1,25 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Free tier, no card required. Render reads this file when you point it at the
+# repository, so the service is defined here rather than in a dashboard nobody
+# can review.
+#
+# One caveat worth knowing before you send anyone the link: a free instance
+# spins down after ~15 minutes idle, and the next request waits ~50 s while it
+# wakes. The app is honest about it — the editor shows its checking state — but
+# the first visit after a quiet spell is slow.
+
+services:
+  - type: web
+    name: bhashasetu
+    runtime: docker
+    plan: free
+    region: singapore # nearest to the Bengali-speaking audience
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # Peppers the recovery-phrase HMAC. Generated once by Render and kept;
+      # rotating it invalidates every issued recovery phrase.
+      - key: BHASHASETU_RECOVERY_PEPPER
+        generateValue: true
