@@ -29,6 +29,25 @@ const DEBOUNCE_MS = 600; // spec §6.1
 
 type Tab = "readability" | "classes" | "pipeline" | "about";
 
+/**
+ * What "I already said no to this" is keyed on.
+ *
+ * Not the edit id and not the offset. Both belong to one snapshot of the text,
+ * and the whole point of an ignore is that it has to outlive the next keystroke
+ * — which shifts every offset after it and, before ids were content-addressed,
+ * changed every id in the document. So `✕` hid a row until the user typed one
+ * more character and the suggestion came straight back.
+ *
+ * The rule instead is "ignore this correction, wherever it occurs": the class,
+ * the flagged text, and the fix being proposed. Ignoring কারন → কারণ ignores it
+ * for the whole document, which is both what a writer means by it and the only
+ * version of the promise the editor can actually keep. Accepting a fix does not
+ * go through here — see `applied`.
+ */
+function ignoreKey(edit: Edit): string {
+  return [edit.errorClass, edit.original, edit.suggestions[0] ?? ""].join("\u0000");
+}
+
 const TABS: { id: Tab; key: StringKey }[] = [
   { id: "readability", key: "tabRead" },
   { id: "classes", key: "tabTypes" },
@@ -47,7 +66,19 @@ export default function Page() {
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [recovery, setRecovery] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+  // Two different kinds of "don't show me this", and conflating them was a bug.
+  //
+  // `ignored` is the user saying no to a suggestion. It has to survive the next
+  // check, and the next check runs on text the user has since edited — so it
+  // cannot be keyed on an edit id or an offset, both of which move. It is keyed
+  // on what the suggestion actually says.
+  //
+  // `applied` is the 600 ms of debounce between accepting a fix and the
+  // re-check that confirms it. Keyed on the id, and thrown away the moment a
+  // fresh result lands: by then the server has spoken, and if the finding is
+  // still there it is still there.
+  const [ignored, setIgnored] = useState<Set<string>>(new Set());
+  const [applied, setApplied] = useState<Set<string>>(new Set());
   const [minConfidence, setMinConfidence] = useState(0.55);
   const [showSuppressed, setShowSuppressed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -101,6 +132,7 @@ export default function Page() {
           signal: controller.signal,
         });
         setResult(res);
+        setApplied(new Set());
         setError(null);
         // Counts only. `lib/analytics.ts` has no field that could hold text,
         // and that is deliberate — this lives in the user's own browser.
@@ -124,8 +156,10 @@ export default function Page() {
     const base = result
       ? [...result.edits, ...(showSuppressed ? result.suppressed : [])]
       : [];
-    return base.filter((e) => !dismissed.has(e.id)).sort((a, b) => a.start - b.start);
-  }, [result, showSuppressed, dismissed]);
+    return base
+      .filter((e) => !applied.has(e.id) && !ignored.has(ignoreKey(e)))
+      .sort((a, b) => a.start - b.start);
+  }, [result, showSuppressed, applied, ignored]);
 
   const outOfScope = result?.outOfScope ?? [];
 
@@ -139,13 +173,14 @@ export default function Page() {
 
   const accept = useCallback((edit: Edit, replacement: string) => {
     applyRef.current(edit, replacement);
-    setDismissed((d) => new Set(d).add(edit.id));
+    setApplied((d) => new Set(d).add(edit.id));
     setSelectedId(null);
     void analytics.record({ type: "accept", errorClass: edit.errorClass });
   }, []);
 
   const ignore = useCallback((edit: Edit) => {
-    setDismissed((d) => new Set(d).add(edit.id));
+    setIgnored((d) => new Set(d).add(ignoreKey(edit)));
+    setSelectedId((id) => (id === edit.id ? null : id));
     void analytics.record({ type: "ignore", errorClass: edit.errorClass });
   }, []);
 
@@ -160,7 +195,7 @@ export default function Page() {
         applyRef.current(e, e.suggestions[0]);
         void analytics.record({ type: "accept", errorClass: e.errorClass });
       }
-      setDismissed((d) => {
+      setApplied((d) => {
         const next = new Set(d);
         batch.forEach((e) => next.add(e.id));
         return next;

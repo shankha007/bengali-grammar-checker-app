@@ -146,3 +146,52 @@ sentences:
   - "কী চমৎকার দৃশ্য!"
   - "তিনটি জিনিস দরকার: কলম, খাতা ও বই।"
   - "আমি বাড়ি গেলাম। সে বাজারে গেল।"
+
+  # --- ও as the conjunction "and", not the pronoun "he/she".
+  #
+  # Added 2026-08-06 after end-to-end testing. Every one of these was flagged
+  # VERB_INFLECTION at 0.86 confidence: ও was in the subject table, so a
+  # coordinated subject with a correct honorific verb read as a third-person
+  # familiar pronoun disagreeing with it. None of these shapes was in the gold
+  # set, which is why the clean-text rate stayed at 0.00% while ordinary formal
+  # Bengali was being underlined in the editor.
+  - "রাম ও শ্যাম বাজারে গেলেন।"
+  - "মা ও বাবা আজ বাড়ি ফিরবেন।"
+  - "শিক্ষক ও ছাত্ররা সভায় উপস্থিত ছিলেন।"
+  - "রবীন্দ্রনাথ ও নজরুল বাংলা সাহিত্যের দুই স্তম্ভ।"
+  - "তিনি ও তাঁর স্ত্রী কাল আসবেন।"
+  - "বিশ শতকে রবীন্দ্রনাথ ঠাকুর ও কাজী নজরুল ইসলাম এই ভাষাকে বিশ্বসাহিত্যের আঙিনায় পৌঁছে দেন।"
+
+  # --- এ as the demonstrative determiner, same failure as ও above.
+  - "এ কথা সবাই জানেন।"
+  - "এ বিষয়ে তিনি কিছু বলেননি।"
+  - "বাংলাদেশ এ অঞ্চলে অবস্থিত।"
+
+  # --- a comma ends a clause.
+  #
+  # `clause_breaks` is matched against word tokens and the tokenizer does not
+  # emit punctuation as a word, so the subject of the first clause was carried
+  # across the comma and judged against the second clause's verb.
+  - "তিনি খুব ভালো মানুষ, সবাই জানে।"
+  - "আমি বাড়ি গেলাম, সে অফিসে গেল।"
+  - "তুমি এসো, আমি অপেক্ষা করব।"
+
+  # --- numeral compounds in শত / শো.
+  #
+  # bn_BD lists the bare numerals and শত/শো separately but not the compounds,
+  # and no affix rule builds them, so every "N hundred" in ordinary prose came
+  # back NON_WORD with three suggestions and no right answer among them.
+  - "আজকের সভায় প্রায় দুইশত জন উপস্থিত ছিলেন।"
+  - "তিনশত টাকা লাগবে।"
+  - "পাঁচশো বছর আগের কথা।"
+  - "দেড়শো পাতার বই।"
+
+  # --- দিন the noun ("day"), not দি + ন the honorific imperative.
+  #
+  # Same accident as নিলাম, which `not_verbs` already covers, but far commoner:
+  # these plain sentences were flagged VERB_INFLECTION at 0.86 and offered দিই
+  # or দিয় in place of the word "day".
+  - "আমি সেখানে তিন দিন ছিলাম।"
+  - "ছেলেটি অনেক দিন পরে এল।"
+  - "আমি তিন দিন ধরে অসুস্থ।"
+  - "ছেলেটি আজ ভালো দিন কাটিয়েছে।"

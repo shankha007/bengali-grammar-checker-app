@@ -13,6 +13,7 @@ not happen.
 
 from __future__ import annotations
 
+import hashlib
 import time
 import uuid
 from dataclasses import dataclass
@@ -173,8 +174,35 @@ def _ms(since: float) -> float:
     return (time.perf_counter() - since) * 1000.0
 
 
-def new_edit_id() -> str:
-    return uuid.uuid4().hex[:16]
+def new_edit_id(
+    error_class: str = "",
+    start: int = 0,
+    end: int = 0,
+    original: str = "",
+    suggestions: tuple[str, ...] | list[str] = (),
+) -> str:
+    """A content-addressed id: the same finding on the same text gets the same id.
+
+    This used to be `uuid4()`, which meant an identical request produced an
+    entirely new set of ids. The editor keys its rows and its current selection
+    on the id, so anything that re-ran the check without changing the text —
+    nudging the confidence slider, toggling "show low-confidence" — remounted
+    every row and silently cleared the explanation pane the user was reading.
+
+    Hashing the finding instead makes the id a property of what was found rather
+    than of when it was found. Uniqueness within a response is not at risk:
+    `Pipeline._resolve` has already removed overlaps, so no two surviving edits
+    share a span, and the span is part of the key.
+    """
+    if not error_class and not original:
+        # No identifying content supplied - fall back rather than hand every
+        # such edit the same id.
+        return uuid.uuid4().hex[:16]
+    digest = hashlib.blake2b(digest_size=8)
+    for part in (error_class, str(start), str(end), original, "\x1f".join(suggestions)):
+        digest.update(part.encode("utf-8"))
+        digest.update(b"\x00")
+    return digest.hexdigest()
 
 
 def sentence_at(sentences: list[Sentence], offset: int) -> Sentence | None:

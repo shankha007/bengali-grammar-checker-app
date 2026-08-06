@@ -63,9 +63,14 @@ class _PersonTables:
     for the four precision devices this implements."""
 
     subjects: dict[str, str]
+    # Pronouns that are also something commoner (ও "and", এ "this"). They block
+    # the rule when they co-occur with a real subject, but are never used as the
+    # subject themselves. See data/verb_person.yaml.
+    ambiguous_subjects: frozenset[str]
     classifier_suffixes: tuple[str, ...]
     classifier_min_stem: int
     clause_breaks: frozenset[str]
+    clause_break_punctuation: frozenset[str]
     final_particles: frozenset[str]
     not_verbs: frozenset[str]
     phrase_heads_before_verb: frozenset[str]
@@ -338,9 +343,11 @@ class BengaliRuleDetector:
                 by_ending.setdefault((ending, name), set()).add(person)
         self._person = _PersonTables(
             subjects=dict(vp.get("subjects", {})),
+            ambiguous_subjects=frozenset(vp.get("ambiguous_subjects", [])),
             classifier_suffixes=tuple(vp.get("classifier_suffixes", [])),
             classifier_min_stem=int(vp.get("classifier_min_stem", 2)),
             clause_breaks=frozenset(vp.get("clause_breaks", [])),
+            clause_break_punctuation=frozenset(vp.get("clause_break_punctuation", [])),
             final_particles=frozenset(vp.get("final_particles", [])),
             not_verbs=frozenset(vp.get("not_verbs", [])),
             phrase_heads_before_verb=frozenset(vp.get("phrase_heads_before_verb", [])),
@@ -407,7 +414,7 @@ class BengaliRuleDetector:
             words = self.tokenizer.words(sent.text, offset=sent.start)
             edits.extend(self._spelling(words, budget))
             edits.extend(self._collocation(words))
-            edits.extend(self._verb_person(words))
+            edits.extend(self._verb_person(text, words))
             edits.extend(self._classifier_agreement(words))
             edits.extend(self._standard_forms(words))
             reg_edits, dominant = self._register_clash(sent, words)
@@ -518,7 +525,7 @@ class BengaliRuleDetector:
                 )
         return out
 
-    def _verb_person(self, words: list[Token]) -> list[Edit]:
+    def _verb_person(self, text: str, words: list[Token]) -> list[Edit]:
         """পুরুষ ও সম্ভ্রম agreement: আমি ভাত খাইবেন → খাইব.
 
         Reads as four filters, each one a way this rule could otherwise invent
@@ -529,9 +536,19 @@ class BengaliRuleDetector:
         # 1. Exactly one subject. Two pronouns means two clauses at least one of
         #    which we cannot attribute, and no subject at all means the rule has
         #    nothing to agree against.
-        subjects = [(i, t) for i, t in enumerate(words) if p.subject_person(t.text)]
-        if len(subjects) > 1:
+        #
+        #    Ambiguous pronouns (ও, এ) count toward that census but cannot be
+        #    the subject: they are far commoner as "and" and "this". Counting
+        #    them keeps "সে ও আমি যাব।" bailing out; not electing them keeps
+        #    "রাম ও শ্যাম বাজারে গেলেন।" — correct prose — unflagged.
+        candidates = [
+            (i, t)
+            for i, t in enumerate(words)
+            if p.subject_person(t.text) or t.text in p.ambiguous_subjects
+        ]
+        if len(candidates) > 1:
             return []
+        subjects = [(i, t) for i, t in candidates if p.subject_person(t.text)]
         # A noun subject licenses one narrow judgement only - see below.
         noun_subject = not subjects
         if subjects:
@@ -552,9 +569,16 @@ class BengaliRuleDetector:
         if person is None:  # pragma: no cover - subjects table guarantees this
             return []
 
-        # 2. The subject's clause, and no further.
+        # 2. The subject's clause, and no further. A clause ends at one of the
+        #    conjunctions in `clause_breaks`, or at punctuation — and the
+        #    punctuation has to be read out of the gap between two word tokens,
+        #    because the tokenizer does not emit it as a word of its own.
         end = len(words)
         for i in range(index + 1, len(words)):
+            gap = text[words[i - 1].end : words[i].start]
+            if any(ch in p.clause_break_punctuation for ch in gap):
+                end = i
+                break
             if words[i].text in p.clause_breaks:
                 end = i
                 break
@@ -762,7 +786,9 @@ class BengaliRuleDetector:
             right, note = found
             out.append(
                 Edit(
-                    id=new_edit_id(),
+                    id=new_edit_id(
+                        ErrorClass.NON_WORD.value, tok.start, tok.end, tok.text, [right]
+                    ),
                     start=tok.start,
                     end=tok.end,
                     original=tok.text,
@@ -870,7 +896,16 @@ class BengaliRuleDetector:
         )
         return [
             Edit(
-                id=new_edit_id(),
+                id=new_edit_id(
+                    ErrorClass.REGISTER_INCONSISTENCY.value,
+                    sent.start,
+                    min(sent.end, sent.start + 1),
+                    # This edit has no `original` — it points at a whole
+                    # sentence — so the minority register stands in as the
+                    # content that identifies it.
+                    minority_label,
+                    [],
+                ),
                 start=sent.start,
                 end=min(sent.end, sent.start + 1),
                 original="",
@@ -886,9 +921,20 @@ class BengaliRuleDetector:
         ]
 
     # ------------------------------------------------------------------
-    _SPACE_BEFORE_DARI = re.compile(r"\s+([" + C.DARI + C.DOUBLE_DARI + r",;:?!])")
-    _MISSING_SPACE_AFTER = re.compile(r"([" + C.DARI + C.DOUBLE_DARI + r"])(?=[ঀ-৿])")
-    _REPEATED = re.compile(r"([,;:!?])\1+")
+    _SPACE_BEFORE_DARI = re.compile(r"[ \t]+([" + C.DARI + C.DOUBLE_DARI + r",;:?!])")
+    # Every terminator and separator, not just the dari. "রহিম,আমি" is the same
+    # error as "রহিম।আমি" and was going unreported because this class listed
+    # only the two dandas.
+    _MISSING_SPACE_AFTER = re.compile(
+        r"([" + C.DARI + C.DOUBLE_DARI + r",;:?!])(?=[ঀ-৿])"
+    )
+    # The dari belongs here too. A doubled one is a typo in prose exactly the
+    # way "??" is; Stage 0 used to fold ।। into ॥ and hide it.
+    _REPEATED = re.compile(r"([,;:!?" + C.DARI + C.DOUBLE_DARI + r"])\1+")
+    # Runs of spaces inside a line. Confined to spaces and tabs so it never
+    # touches a newline, and anchored to require a non-space on the left so it
+    # leaves indentation alone.
+    _MULTI_SPACE = re.compile(r"(?<=\S)([ \t]{2,})(?=\S)")
     # A Latin period ending a Bengali sentence. Guarded so it never touches
     # numbers, abbreviations, URLs, or embedded English.
     _LATIN_PERIOD = re.compile(r"(?<=[ঀ-৿])\s*(\.)(?=\s|$)")
@@ -937,6 +983,21 @@ class BengaliRuleDetector:
                     confidence=0.8,
                     wrong=m.group(0),
                     right=m.group(1),
+                )
+            )
+
+        for m in self._MULTI_SPACE.finditer(text):
+            out.append(
+                self._span_edit(
+                    ErrorClass.PUNCTUATION,
+                    m.start(1),
+                    m.end(1),
+                    m.group(1),
+                    [" "],
+                    confidence=0.85,
+                    rule_reference="শব্দের মাঝে একটিমাত্র ফাঁকা স্থান",
+                    wrong=m.group(1),
+                    right=" ",
                 )
             )
 
@@ -995,12 +1056,13 @@ class BengaliRuleDetector:
     ) -> Edit:
         spec = self.specs[klass]
         bn, en = spec.render(**fields)
+        kept = [s for s in suggestions if s]
         return Edit(
-            id=new_edit_id(),
+            id=new_edit_id(klass.value, start, end, original, kept),
             start=start,
             end=end,
             original=original,
-            suggestions=[s for s in suggestions if s],
+            suggestions=kept,
             error_class=klass,
             confidence=max(0.0, min(1.0, confidence)),
             stage=1,

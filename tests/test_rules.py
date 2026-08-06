@@ -219,6 +219,25 @@ def test_verb_person_agreement(
         # A noun subject licenses the animacy judgement only. Here বইটি is the
         # object and the subject is an unwritten আমি.
         "বইটি পড়ে শেষ করেছি।",
+        # ও is the conjunction "and" far more often than the pronoun "he", and
+        # reading it as a third-person-familiar subject made every coordinated
+        # subject with an honorific verb — which is most formal Bengali — come
+        # back as a পুরুষ error. See ambiguous_subjects in verb_person.yaml.
+        "রাম ও শ্যাম বাজারে গেলেন।",
+        "মা ও বাবা আজ বাড়ি ফিরবেন।",
+        "শিক্ষক ও ছাত্ররা সভায় উপস্থিত ছিলেন।",
+        # এ is the demonstrative determiner here, not a bare pronoun.
+        "এ কথা সবাই জানেন।",
+        "এ বিষয়ে তিনি কিছু বলেননি।",
+        # A comma ends a clause as firmly as a conjunction does. Without that,
+        # তিনি was carried across into a clause whose subject is সবাই.
+        "তিনি খুব ভালো মানুষ, সবাই জানে।",
+        "আমি বাড়ি গেলাম, সে অফিসে গেল।",
+        # দিন is the noun "day" far more often than দি + ন, the honorific
+        # imperative — the same trap as নিলাম, and commoner. See not_verbs.
+        "আমি সেখানে তিন দিন ছিলাম।",
+        "ছেলেটি অনেক দিন পরে এল।",
+        "আমি তিন দিন ধরে অসুস্থ।",
     ],
 )
 def test_verb_person_silent_on_correct_sentences(pipeline: Pipeline, text: str) -> None:
@@ -476,6 +495,49 @@ def test_latin_period_after_bengali(pipeline: Pipeline) -> None:
 def test_period_rule_does_not_touch_abbreviations_or_urls(
     pipeline: Pipeline, text: str
 ) -> None:
+    assert ErrorClass.PUNCTUATION not in classes(pipeline.check(text))
+
+
+@pytest.mark.parametrize(
+    ("text", "wrong", "right"),
+    [
+        # A doubled dari. Stage 0 used to fold this into ॥ before the rule ran,
+        # so the commonest punctuation typo there is produced no flag at all.
+        ("আমি স্কুলে যাই।।", "।।", "।"),
+        # A separator needs a space after it, not just a dari. This class listed
+        # only the two dandas, so "রহিম,আমি" went unreported.
+        ("আমার নাম রহিম,আমি ছাত্র।", ",", ", "),
+        ("তুমি কি আসবে?আমি জানি না।", "?", "? "),
+        # Runs of spaces between words.
+        ("সে   অনেক ভালো ছেলে।", "   ", " "),
+    ],
+)
+def test_punctuation_catches(
+    pipeline: Pipeline, text: str, wrong: str, right: str
+) -> None:
+    edits = [
+        e
+        for e in pipeline.check(text).edits
+        if e.error_class is ErrorClass.PUNCTUATION and e.original == wrong
+    ]
+    assert edits, f"nothing flagged {wrong!r} in {text!r}"
+    assert edits[0].suggestions == [right]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # A newline is not a stray space before the dari: deleting it would
+        # merge two paragraphs, so the space rules are confined to spaces/tabs.
+        "প্রথম লাইন\n।",
+        "প্রথম অনুচ্ছেদ।\n\nদ্বিতীয় অনুচ্ছেদ।",
+        # Indentation is not a run of spaces between two words.
+        "    আমি বাড়ি যাব।",
+        # A single space after every separator is what correct text looks like.
+        "আমার নাম রহিম, আমি ছাত্র।",
+    ],
+)
+def test_punctuation_silent_on_correct_spacing(pipeline: Pipeline, text: str) -> None:
     assert ErrorClass.PUNCTUATION not in classes(pipeline.check(text))
 
 

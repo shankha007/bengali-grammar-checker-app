@@ -76,6 +76,23 @@ const CASES = [
   { name: "clean-reading", text: "সে বই পড়ে ঘুমিয়ে পড়ল।", want: null },
   { name: "clean-future", text: "আমি বই পড়ব।", want: null },
   { name: "clean-saree", text: "আমি শাড়ি পরে বিদ্যালয়ে যাব।", want: null },
+
+  // Punctuation the class used to miss entirely. The doubled dari is the one
+  // worth having here rather than only in pytest: Stage 0 folded ।। into ॥
+  // before Stage 1 ran, so the bug was invisible from the Python side too — the
+  // detector was never wrong, it was never asked.
+  { name: "double-dari", text: "আমি স্কুলে যাই।।", want: "PUNCTUATION" },
+  { name: "no-space-after-comma", text: "আমার নাম রহিম,আমি ছাত্র।", want: "PUNCTUATION" },
+  { name: "run-of-spaces", text: "সে   অনেক ভালো ছেলে।", want: "PUNCTUATION" },
+
+  // False positives that reached the screen while every Python test passed,
+  // because no gold case had this shape. ও is the conjunction "and", এ is the
+  // demonstrative, a comma ends a clause, and দিন is the noun "day".
+  { name: "clean-o-conjunction", text: "রাম ও শ্যাম বাজারে গেলেন।", want: null },
+  { name: "clean-e-demonstrative", text: "এ কথা সবাই জানেন।", want: null },
+  { name: "clean-comma-clause", text: "তিনি খুব ভালো মানুষ, সবাই জানে।", want: null },
+  { name: "clean-day-noun", text: "আমি সেখানে তিন দিন ছিলাম।", want: null },
+  { name: "clean-numeral-compound", text: "তিনশত টাকা লাগবে।", want: null },
 ];
 
 async function launch() {

@@ -24,6 +24,11 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _console import use_utf8
+
+use_utf8()
+
 REPO = Path(__file__).resolve().parents[1]
 NUKTA = "়"
 # Code points, not literals - see the module docstring.

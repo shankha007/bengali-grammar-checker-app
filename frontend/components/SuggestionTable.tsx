@@ -1,5 +1,6 @@
 "use client";
 
+import { showSpaces } from "@/lib/display";
 import { useLang } from "@/lib/i18n";
 import { CATEGORY_VAR, type Edit, type OutOfScopeSpan } from "@/lib/types";
 
@@ -80,14 +81,14 @@ export default function SuggestionTable({
                 />
               </td>
               <td className="truncate" title={e.original}>
-                {e.original.trim() || <em style={{ opacity: 0.6 }}>—</em>}
+                {showSpaces(e.original) || <em style={{ opacity: 0.6 }}>—</em>}
               </td>
               <td
                 className="truncate font-medium"
                 style={{ color: "var(--ok)" }}
                 title={e.suggestions.join(", ")}
               >
-                {e.suggestions[0] ?? "—"}
+                {e.suggestions[0] === undefined ? "—" : showSpaces(e.suggestions[0])}
               </td>
               <td
                 className="truncate text-[10px] uppercase tracking-wide"
@@ -108,7 +109,10 @@ export default function SuggestionTable({
                         ev.stopPropagation();
                         onAccept(e, e.suggestions[0]);
                       }}
-                      aria-label={`${t("acceptAria")}: ${e.original} → ${e.suggestions[0]}`}
+                      // Through showSpaces as well: for a whitespace edit the
+                      // raw label announced "accept:  →  ", which is no more
+                      // use to a screen reader than it was on screen.
+                      aria-label={`${t("acceptAria")}: ${showSpaces(e.original)} → ${showSpaces(e.suggestions[0])}`}
                     >
                       ✓
                     </button>

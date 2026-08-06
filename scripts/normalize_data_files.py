@@ -11,8 +11,14 @@ to user input, so lexicon lookups compare like with like.
 
 from __future__ import annotations
 
+import sys
 import unicodedata
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _console import use_utf8
+
+use_utf8()
 
 REPO = Path(__file__).resolve().parents[1]
 NUKTA = "়"

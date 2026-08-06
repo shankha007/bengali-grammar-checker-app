@@ -33,6 +33,11 @@ from bhashasetu.core.registry import get_pack
 from bhashasetu.core.types import ErrorClass
 from bhashasetu.eval.harness import load_gold
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _console import use_utf8
+
+use_utf8()
+
 MIN_PER_CLASS = 3
 
 

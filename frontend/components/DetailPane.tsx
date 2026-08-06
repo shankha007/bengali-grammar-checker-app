@@ -1,5 +1,6 @@
 "use client";
 
+import { showSpaces } from "@/lib/display";
 import { useLang } from "@/lib/i18n";
 import { CATEGORY_LABEL, CATEGORY_VAR, type Edit } from "@/lib/types";
 
@@ -98,7 +99,9 @@ export default function DetailPane({
             className={`btn ${i === 0 ? "btn-primary" : ""}`}
             onClick={() => onAccept(s)}
           >
-            {s}
+            {/* Display only — `onAccept` still receives the real string. A
+                whitespace suggestion rendered raw is an empty button. */}
+            {showSpaces(s)}
           </button>
         ))}
         {edit.suggestions.length === 0 && (

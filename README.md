@@ -300,7 +300,7 @@ text you submitted.
 
 ## Where it stands
 
-Measured on 376 error cases and 104 clean sentences:
+Measured on 376 error cases and 124 clean sentences:
 
 | Error class | Category | Stage | N | P | R | F0.5 |
 |---|---|---|---:|---:|---:|---:|
@@ -316,9 +316,9 @@ Measured on 376 error cases and 104 clean sentences:
 | `CASE_MARKER`, `WORD_ORDER`, `POS_ERROR` | — | Phase 2 | 67 | — | — | 0.000 |
 
 ```
-false positives on clean text     0.00%  (0/104)   ceiling 3%
+false positives on clean text     0.00%  (0/124)   ceiling 3%
 macro F0.5 (implemented classes)  0.837
-latency p50 / p95 / p99 (ms)      11 / 1025 / 1148
+latency p50 / p95 / p99 (ms)      5 / 581 / 674
 gold set                          353 / 376 human-verified (23 awaiting sign-off)
 ```
 
@@ -344,9 +344,12 @@ sentences in *other* class slices contain deliberately malformed tokens, and eve
 surfaced edit that is not the expected one is charged as a false positive to
 whichever class emitted it.
 
-**Known limitation:** p99 latency of 842 ms sits at the 800 ms budget. It is
-almost entirely Hunspell's suggester on cold unknown words, and the gold set is
-unusually dense with them. It is capped at 25 suggester calls per request.
+**Known limitation:** p99 latency of 674 ms sits just under the 800 ms budget.
+It is almost entirely Hunspell's suggester on cold unknown words, and the gold
+set is unusually dense with them. It is capped at 25 suggester calls per request.
+Teaching the lexicon the numeral compounds (দুইশত, পাঁচশো) took a measurable bite
+out of this for the same reason it removed the false positives: every word the
+dictionary already knows is a suggester call that never happens.
 
 ---
 
@@ -503,7 +506,7 @@ frontend/
   components/            Editor, SuggestionTable, DetailPane, Panels, HeroArt
   lib/                   api, types, i18n, theme, layout, analytics, offsets
 
-eval/gold/               353 error cases + 104 clean sentences, README first
+eval/gold/               353 error cases + 124 clean sentences, README first
 scripts/                 lints, gold validation, dictionary fetch
 docs/                    phase1-review.md, readability.md
 ```

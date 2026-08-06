@@ -116,8 +116,16 @@ def test_repeated_hasanta_collapsed(norm: BengaliNormalizer) -> None:
     assert norm.normalize("রা" + C.HASANTA * 3 + "ম").text == "রা" + C.HASANTA + "ম"
 
 
-def test_double_dari(norm: BengaliNormalizer) -> None:
-    assert norm.normalize("শেষ" + C.DARI * 2).text == "শেষ" + C.DOUBLE_DARI
+def test_double_dari_is_left_for_stage_1(norm: BengaliNormalizer) -> None:
+    """Stage 0 must not fold ।। into ॥.
+
+    It used to, and that quietly destroyed the evidence: the fold turned the
+    commonest punctuation typo there is into a legal verse terminator before
+    Stage 1 ran, so the user got no flag at all. Stage 0 is for changes the
+    writer could not disagree with. `tests/test_rules.py` asserts the flag.
+    """
+    text = "শেষ" + C.DARI * 2
+    assert norm.normalize(text).text == text
 
 
 def test_non_bengali_text_untouched(norm: BengaliNormalizer) -> None:
