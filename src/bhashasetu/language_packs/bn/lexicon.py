@@ -443,6 +443,23 @@ def load_default_lexicon() -> BengaliLexicon:
     )
 
     hunspell_dic = _DATA / "hunspell" / "bn_BD.dic"
+    if not hunspell_dic.exists():
+        # The quiet path, and the one that actually bit in production. A
+        # dictionary that fails to LOAD already warned below; a dictionary that
+        # was never fetched said nothing at all and returned a working-looking
+        # pack. The consequence is not partial: `coverage_factor` scales
+        # NON_WORD confidence by ~650/150000, so every spelling flag arrives at
+        # 0.003 against a 0.55 display gate and the checker reports misspelt
+        # Bengali as clean. Nothing downstream can tell that apart from "no
+        # errors found", so this has to be said here.
+        print(
+            f"WARNING: no Bengali dictionary at {hunspell_dic.parent}. Running "
+            f"on the {len(words) + len(extra)}-word seed lexicon, which damps "
+            "unknown-word confidence below the display threshold — SPELLING "
+            "ERRORS WILL NOT BE REPORTED. Grammar, register and punctuation "
+            "still work. Fix with: python scripts/fetch_dictionaries.py --yes",
+            file=sys.stderr,
+        )
     if hunspell_dic.exists():
         try:
             lex = HunspellLexicon(

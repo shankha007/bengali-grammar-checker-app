@@ -118,6 +118,16 @@ export const STRINGS = {
     en: "Every feature is free. Text is discarded when the response is sent.",
   },
   dictionary: { bn: "অভিধান", en: "Dictionary" },
+  // Shown across the top of the editor when the pack fell back to the seed
+  // list. Silence here is the worst thing this app can do: without the real
+  // dictionary every spelling flag is damped to 0.003 against a 0.55 gate, so
+  // the checker reports misspelt Bengali as clean and looks perfectly healthy
+  // doing it. Say it in the editor, not just in the About tab, because nobody
+  // opens the About tab to find out why they were told nothing was wrong.
+  seedLexiconWarning: {
+    bn: "বানান পরীক্ষা বন্ধ আছে: বাংলা অভিধান লোড হয়নি, তাই এখন কেবল ব্যাকরণ ও যতিচিহ্নের ভুল ধরা পড়ছে। বানান ভুল থাকলেও দেখানো হবে না।",
+    en: "Spell-checking is off: the Bengali dictionary did not load, so only grammar and punctuation are being checked. Misspellings will not be reported.",
+  },
   device: { bn: "ডিভাইস", en: "Device" },
   generateRecovery: { bn: "পুনরুদ্ধার-বাক্য তৈরি করুন", en: "Generate recovery phrase" },
   recoveryNote: {

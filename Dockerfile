@@ -63,16 +63,31 @@ COPY --from=web /web/out /app/web
 # or a class that lost its gold cases is a build error, not a surprise on
 # someone's first request.
 #
-# Prints what it loaded, so a future failure here is diagnosable from the build
-# log alone — the bare `python -c` reported only "exit code: 1" and left you
-# reading a traceback out of context.
+# The dictionary check is part of that, and it is the one this image got wrong.
+# The fetch above is non-fatal by design, on the reasoning that a network blip
+# should cost spelling detection rather than the whole deployment. That reasoning
+# does not survive contact with what the fallback actually does: the seed list is
+# ~650 words, `coverage_factor` scales NON_WORD confidence by 650/150000, and
+# every spelling flag lands at 0.003 against a 0.55 display gate. The checker
+# does not degrade — it goes silent, while continuing to look healthy. A user
+# typing "মা কাপর কাচছিলেন।" is told the sentence is clean.
+#
+# A deploy that cannot spell-check is not a working deploy, so this now fails.
+# Set BHASHASETU_ALLOW_SEED_LEXICON=1 to build anyway (a demo of the rule engine
+# alone, or an air-gapped build), and accept that spelling is off.
+ARG BHASHASETU_ALLOW_SEED_LEXICON=0
 RUN python -c "\
-import sys; \
+import os, sys; \
 from bhashasetu.core.registry import get_pack; \
 pack = get_pack('bn'); \
-print(f'pack ok: {pack.code}, lexicon {pack.lexicon.size} words, ' \
+kind = type(pack.lexicon).__name__; \
+print(f'pack ok: {pack.code}, lexicon {pack.lexicon.size} words ({kind}), ' \
       f'{len(pack.detectors)} detector(s)'); \
-sys.exit(0)"
+ok = kind == 'HunspellLexicon' or os.environ.get('BHASHASETU_ALLOW_SEED_LEXICON') == '1'; \
+sys.exit(0) if ok else sys.exit( \
+    print('FATAL: the Hunspell dictionary did not load, so this image would ' \
+          'report every misspelling as correct. Check the fetch step above. ' \
+          'Set BHASHASETU_ALLOW_SEED_LEXICON=1 to ship without spelling.') or 1)"
 
 # Hosts inject $PORT and expect the process to honour it. 8000 is the local
 # default so `docker run` behaves without extra flags.
