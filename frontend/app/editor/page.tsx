@@ -295,6 +295,20 @@ export default function Page() {
         </div>
       </div>
 
+      {/* Not dismissible, and above the error slot. A missing dictionary is not
+          an event that just happened — it is the state the whole session runs
+          in, and every "no issues found" the user reads afterwards is qualified
+          by it. */}
+      {language?.dictionary === "seed" && (
+        <div
+          role="alert"
+          className="rounded px-2 py-1 text-[11px]"
+          style={{ background: "var(--warn-bg)", color: "var(--warn-fg)" }}
+        >
+          {t("seedLexiconWarning")}
+        </div>
+      )}
+
       {error && (
         <div
           role="alert"

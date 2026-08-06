@@ -86,6 +86,37 @@ one you got, check the build log for the warning.
 curl https://YOUR-URL/api/health
 ```
 
+**Then check the dictionary, which is the one thing that can be wrong without
+looking wrong:**
+
+```bash
+curl https://YOUR-URL/api/languages
+```
+
+`"dictionary":"hunspell"` with a `lexiconSize` around 80,000 is a healthy
+deploy. `"dictionary":"seed"` with a `lexiconSize` under a thousand means the
+build-time fetch failed and **spelling errors are not being reported at all** —
+`coverage_factor` scales every `NON_WORD` confidence by roughly 650/150000, so
+they land at 0.003 against a 0.55 display gate. The app does not error, does not
+warn in the API response, and returns "no issues found" for plainly misspelt
+Bengali. It looks like a working checker that thinks your text is fine.
+
+Since this was first hit in production, three things guard it: the image build
+now fails outright rather than shipping without a dictionary (override with
+`--build-arg BHASHASETU_ALLOW_SEED_LEXICON=1`), the pack logs a loud warning at
+startup, and the editor shows a banner instead of implying silence means clean.
+
+A one-line check that distinguishes it from a stale deploy — type this into the
+live editor:
+
+```
+মা কাপর কাচছিলেন।
+```
+
+Nothing flagged means the dictionary is missing. `কাপর → কাপড়` means it is fine.
+(For contrast, `এর কারন কী?` flags in *both* cases: `NOTVA_SHOTVA` runs off a
+hand-written list and is never dictionary-damped, so it is not a useful test.)
+
 Then, against the live URL:
 
 ```bash
