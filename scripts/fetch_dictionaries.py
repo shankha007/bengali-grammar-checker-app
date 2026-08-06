@@ -53,17 +53,50 @@ def sanitize_aff(path: Path) -> int:
     strict-parser toolchain will hit this.
 
     Returns the number of lines changed. Idempotent.
+
+    `newline=""` on both ends: without it, Python rewrites every LF as CRLF on
+    Windows, so a developer who ran this locally ended up with an .aff 2 KB
+    larger than upstream and a diff against it on every line. Harmless to
+    spylls, but it disguises what this function actually changed — which
+    mattered here, because the size difference was the first clue that the local
+    file had been through a step the Docker build never ran.
     """
-    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+    with path.open("r", encoding="utf-8", newline="") as fh:
+        lines = fh.readlines()
     changed = 0
     for i, line in enumerate(lines):
         m = _AFF_HEADER.match(line)
         if m:
-            lines[i] = m.group(1) + "\n"
+            # Keep whatever line ending the file already used.
+            ending = line[len(line.rstrip("\r\n")) :]
+            lines[i] = m.group(1) + ending
             changed += 1
     if changed:
-        path.write_text("".join(lines), encoding="utf-8")
+        with path.open("w", encoding="utf-8", newline="") as fh:
+            fh.write("".join(lines))
     return changed
+
+
+def verify(dic_path: Path) -> str | None:
+    """Load the pair the way the pack will. Returns an error string, or None.
+
+    Downloading two files successfully is not the same as having a usable
+    dictionary, and the gap between those two facts is what shipped a mute
+    spell-checker to production: the fetch reported "Done", the pack could not
+    parse the .aff, and the fallback to the seed lexicon happened quietly three
+    layers away from here. If the files this script just wrote cannot be loaded,
+    this script has failed, and it should say so while the reason is still in
+    front of it.
+    """
+    try:
+        from spylls.hunspell import Dictionary
+    except ImportError:
+        return None  # spylls is an optional extra; nothing to verify against
+    try:
+        Dictionary.from_files(str(dic_path.with_suffix("")))
+    except Exception as exc:
+        return f"{type(exc).__name__}: {exc}"
+    return None
 
 
 def main() -> int:
@@ -83,8 +116,30 @@ def main() -> int:
             target.write_bytes(resp.read())
         print(f"{target.stat().st_size:,} bytes")
 
-    print("\nDone. The pack will pick these up on next load; re-run `make eval`")
-    print("and expect NON_WORD precision/recall to move for the first time.")
+    # bn_BD.aff ships SFX/PFX headers whose count field carries a trailing `$`.
+    # Hunspell's C `atoi` ignores it; spylls calls `int()` and raises
+    # ValueError, which the pack catches and answers by falling back to the seed
+    # lexicon — silently, and with spelling detection effectively switched off.
+    #
+    # This call is the whole reason `sanitize_aff` exists, and it was missing:
+    # the function was written, documented, tested by hand, and never wired in.
+    # A developer who had run the repair once had a working dictionary on disk
+    # and no way to notice, while every clean build got the raw file. It cost a
+    # production deploy that reported misspelt Bengali as correct.
+    aff = DEST / "bn_BD.aff"
+    if aff.exists():
+        fixed = sanitize_aff(aff)
+        print(f"sanitized {aff.name}: {fixed} affix header(s) repaired")
+
+    # Prove the result loads before claiming success.
+    problem = verify(DEST / "bn_BD.dic")
+    if problem is not None:
+        print(f"\nFAILED: the downloaded dictionary does not load ({problem}).")
+        print("Leaving the files in place for inspection:", DEST)
+        return 1
+
+    print("\nDone, and verified loadable. The pack will pick these up on next")
+    print("load; re-run `make eval` and expect NON_WORD to move.")
     return 0
 
 
