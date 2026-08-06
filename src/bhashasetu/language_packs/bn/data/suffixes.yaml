@@ -32,6 +32,35 @@ prefixes:
   - "পুনঃ"
   - "আধা"
 
+# Suffixes that only attach to a VOWEL-final stem.
+#
+# This is not a "generous vs strict" dial like the rest of the file — it is the
+# difference between a reading Bengali allows and one it does not. The genitive
+# after a consonant is -এর / -ের: ঘর → ঘরের, never ঘরর. Bare -র is genitive only
+# after a vowel: মা → মার, বাবা → বাবার, নদী → নদীর.
+#
+# Without the constraint the stripper would peel -র off anything, so a
+# misspelling that happens to end in র resolved to a real stem and was accepted
+# in silence. কাপর (should be কাপড়) parsed as কাপ + genitive and the checker
+# reported the sentence clean; শিকর (শিকড়) did the same. That is the worst
+# failure mode this file has, because over-generous stripping is supposed to
+# cost recall on words the dictionary lacks — not to whitewash a real error on a
+# word it has.
+#
+# Measured before adding: across the seed lexicon, extra_words and the whole
+# gold clean slice, ZERO real words are lost to this. Every string it newly
+# rejects (ঘরর, হাতর, স্কুলর) is one Bengali cannot build.
+#
+# Orthographic test, not phonological: a stem is vowel-final when it ends in a
+# vowel sign or an independent vowel. Bengali's inherent vowel makes the true
+# rule subtler — ছাত্র is pronounced with a final vowel — but the genitive there
+# is ছাত্রের anyway, so the orthographic test lands on the right answer.
+vowel_final_only:
+  - "র"
+  - "রে"
+  - "য়"
+  - "য়ে"
+
 suffixes:
   # বিভক্তি - case markers
   case:

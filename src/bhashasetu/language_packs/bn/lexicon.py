@@ -18,6 +18,7 @@ suggestions rather than confident wrong ones. Ship a real Hunspell dictionary
 
 from __future__ import annotations
 
+import os
 import sys
 import unicodedata
 from collections.abc import Iterable
@@ -28,7 +29,7 @@ import yaml
 
 from bhashasetu.core.distance import rank_candidates
 from bhashasetu.language_packs.bn import chars as C
-from bhashasetu.language_packs.bn.phonetic import soundex
+from bhashasetu.language_packs.bn.phonetic import homophone_substitution, soundex
 
 _DATA = Path(__file__).parent / "data"
 
@@ -41,6 +42,11 @@ MIN_HUNSPELL_STEMS = 1_000
 # not the writer, is the likely problem.
 CONFIDENT_LEXICON_SIZE = 150_000
 
+# How many suffix splits `_stem_reconstructions` will try on one word. See there:
+# every split is another pool scan, and the payoff falls off fast after the
+# longest few.
+MAX_STEM_SPLITS = 4
+
 
 def _compose(word: str) -> str:
     """NFC plus the three composition-exclusion cases NFC refuses.
@@ -51,6 +57,21 @@ def _compose(word: str) -> str:
     for base, composed in C.NUKTA_COMPOSITIONS.items():
         out = out.replace(base + C.NUKTA, composed)
     return out
+
+
+def _vowel_final(stem: str) -> bool:
+    """Does this stem end in a vowel, orthographically?
+
+    A vowel sign or an independent vowel. Bengali's inherent vowel makes the
+    phonological rule subtler — ছাত্র ends in a consonant letter but is
+    pronounced with a final vowel — and this test calls that consonant-final.
+    That is the right answer anyway: the genitive of ছাত্র is ছাত্রের, not
+    ছাত্রর, so the two disagree only where the strict reading is also correct.
+    """
+    if not stem:
+        return False
+    last = stem[-1]
+    return last in C.VOWEL_SIGNS or last in C.INDEPENDENT_VOWELS
 
 
 @dataclass(frozen=True, slots=True)
@@ -67,6 +88,7 @@ class BengaliLexicon:
         suffixes: list[str],
         frequency: dict[str, int] | None = None,
         prefixes: Iterable[str] = (),
+        vowel_final_only: Iterable[str] = (),
     ) -> None:
         # Compose on ingest. Lookups arrive normalized (Stage 0 ran first), so a
         # decomposed entry in the word list would simply never match — silently,
@@ -77,6 +99,9 @@ class BengaliLexicon:
         # Longest first: -গুলোকেও must strip before -ও.
         self._suffixes = sorted({s for s in suffixes if s}, key=len, reverse=True)
         self._prefixes = sorted({p for p in prefixes if p}, key=len, reverse=True)
+        # See data/suffixes.yaml: these attach to a vowel-final stem only, and
+        # stripping them off a consonant is how a misspelling gets whitewashed.
+        self._vowel_final_only = frozenset(s for s in vowel_final_only if s)
         self._freq = frequency or {}
         self._by_key: dict[str, list[str]] = {}
         for w in self._words:
@@ -113,6 +138,11 @@ class BengaliLexicon:
             for suf in self._suffixes:
                 if len(word) > len(suf) + 1 and word.endswith(suf):
                     stem = word[: -len(suf)]
+                    if suf in self._vowel_final_only and not _vowel_final(stem):
+                        # ঘর + র is not a word Bengali can build; the genitive
+                        # there is ঘরের. Accepting it would let কাপর pass as
+                        # কাপ + genitive and hide a real spelling error.
+                        continue
                     inner = self.lookup(stem, _depth + 1)
                     if inner.known:
                         return Lookup(
@@ -148,9 +178,16 @@ class BengaliLexicon:
         `rank_candidates` sort by distance-then-phonetic-match gives the right
         order without a hand-tuned score.
         """
-        pool: set[str] = set(self._by_key.get(soundex(word), []))
-        for length in range(max(1, len(word) - 2), len(word) + 3):
-            pool.update(self._by_len.get(length, []))
+        pool = self._pool_for(word)
+        # Re-inflected stem corrections join the same pool rather than standing
+        # in for it, and everything is ranked against the word the user typed.
+        # Choosing between the two pools up front got this wrong twice: with the
+        # stem path used only as a fallback, সিতকালে kept the direct pool's
+        # সিটকাল and never saw শীতকালে; with the first workable suffix winning,
+        # পূকুরপারে split as পূকুরপা + রে and produced পুকুরপাড়রে instead of
+        # পুকুরপাড়ে. Ranking every reconstruction against the original settles
+        # both, because the closest one is the answer by definition.
+        pool.update(self._stem_reconstructions(word, limit))
         pool.discard(word)
         return rank_candidates(
             word,
@@ -158,8 +195,76 @@ class BengaliLexicon:
             max_distance=2,
             phonetic_key=soundex,
             frequency=self._freq,
+            prefer=homophone_substitution,
             limit=limit,
         )
+
+    def _pool_for(self, word: str) -> set[str]:
+        pool: set[str] = set(self._by_key.get(soundex(word), []))
+        for length in range(max(1, len(word) - 2), len(word) + 3):
+            pool.update(self._by_len.get(length, []))
+        return pool
+
+    def _stem_reconstructions(self, word: str, limit: int) -> list[str]:
+        """Correct the stem, then put the suffix back.
+
+        A dictionary stores stems. Bengali writes inflected forms, and the two
+        are routinely further apart than the distance filter allows: সিতকালে is
+        three edits from শীতকাল — স→শ, ি→ী, and the ে that শীতকাল does not carry
+        — so the correction was rejected as too distant and the writer was
+        offered সিটকাল, which is neither the right word nor the right form.
+
+        Peeling a suffix the lexicon already recognises brings the comparison
+        back to stem against stem, where the real error is the only difference.
+        সিতকাল → শীতকাল is one homophone swap plus one vowel-length swap, well
+        inside the window, and re-attaching ে hands back শীতকালে — a form the
+        writer can accept without editing it further.
+
+        Every viable split contributes; the caller ranks them all against the
+        original. Not a morphological generator — it re-attaches the exact
+        suffix it removed and attempts no sandhi, which is Phase 4's job.
+        """
+        out: list[str] = []
+        explored = 0
+        for suf in self._suffixes:
+            if len(word) <= len(suf) + 1 or not word.endswith(suf):
+                continue
+            stem = word[: len(word) - len(suf)]
+            if suf in self._vowel_final_only and not _vowel_final(stem):
+                continue
+            if self.lookup(stem).known:
+                # The stem is fine, so the suffix is the unusual part. Guessing
+                # a different one would be a CASE_MARKER opinion, not a spelling
+                # one, and this class does not hold those.
+                continue
+            # Each split costs a full pool scan, and a long agglutinated word
+            # matches a dozen suffixes. Suffixes are sorted longest-first, and
+            # the useful splits are the long ones — a one-character split leaves
+            # a stem barely shorter than the word, which the direct pool already
+            # covered. Capping here is what keeps p99 inside the spec §10 budget.
+            explored += 1
+            if explored > MAX_STEM_SPLITS:
+                break
+            # Phonetic bucket only, not the length window the direct pool uses.
+            # The length window means scanning five buckets of an 80k lexicon,
+            # and it is what pushed p99 past the budget once this ran on every
+            # unknown word. It also buys nothing here: a stem worth correcting
+            # is one the writer misheard rather than mistyped, so it shares the
+            # misspelling's sound. Every case this pass was added for — the
+            # ড়/র and ণ/ন swaps — is inside the bucket by construction.
+            out.extend(
+                cand + suf
+                for cand in rank_candidates(
+                    stem,
+                    [c for c in self._by_key.get(soundex(stem), []) if c != stem],
+                    max_distance=2,
+                    phonetic_key=soundex,
+                    frequency=self._freq,
+                    prefer=homophone_substitution,
+                    limit=limit,
+                )
+            )
+        return out
 
 
 class HunspellLexicon(BengaliLexicon):
@@ -175,6 +280,7 @@ class HunspellLexicon(BengaliLexicon):
         suffixes: list[str],
         supplement: Iterable[str] = (),
         prefixes: Iterable[str] = (),
+        vowel_final_only: Iterable[str] = (),
     ) -> None:
         try:
             from spylls.hunspell import Dictionary
@@ -202,8 +308,14 @@ class HunspellLexicon(BengaliLexicon):
         # would make the checker noisier.
         words = [w.stem for w in self._dict.dic.words]
         words.extend(supplement)
-        super().__init__(words, suffixes, prefixes=prefixes)
+        super().__init__(
+            words, suffixes, prefixes=prefixes, vowel_final_only=vowel_final_only
+        )
         self._suggest_cache: dict[str, list[str]] = {}
+        self._suggester_broken = False
+        self._use_hunspell_suggester = (
+            os.environ.get("BHASHASETU_HUNSPELL_SUGGEST", "") == "1"
+        )
 
     @property
     def coverage_factor(self) -> float:
@@ -228,21 +340,59 @@ class HunspellLexicon(BengaliLexicon):
         return bool(self._dict.lookup(word)) or super().contains(word)
 
     def suggest(self, word: str, limit: int = 5) -> list[str]:
-        """Hunspell's suggester, re-ranked by our phonetic key.
+        """Candidates from the phonetic and length pools, re-ranked.
 
-        Hunspell already knows the affix machinery, so its candidate list is
-        better than anything the seed pools produce. What it does not know is
-        that Bengali readers confuse ষ/শ/স and ন/ণ far more often than they
-        transpose letters - so the candidates get re-sorted through
-        `rank_candidates`, which prefers a same-Soundex match at equal edit
-        distance.
+        WHY NOT SPYLLS' OWN SUGGESTER, which this class obviously ought to use:
+        it is too slow to run while someone is typing. Measured on bn_BD, one
+        cold unknown word:
+
+            কাপর          3.5 s
+            শিকর          5.6 s
+            বিখ্যত       12.7 s
+            সিতকালে      16.9 s
+            পূকুরপারে    16.5 s
+
+        against a spec §10 budget of p95 < 800 ms for a whole document. The
+        editor re-checks 600 ms after each pause, so a five-word sentence with
+        four unknown words took 38 seconds to come back. Taking the generator
+        lazily does not help: the cost is in the affix and n-gram exploration
+        that runs before the first yield.
+
+        This is worth stating plainly because the call was already here and had
+        never once executed — it read `self._dict.suggester.suggest(...)`, which
+        does not exist (spylls names that method `suggestions`), inside a bare
+        `except Exception`. So every suggestion this checker has ever made came
+        from the pools below, and the measurements above are what it costs to
+        "fix" that. Quality is genuinely better with spylls — it puts কাপড়
+        second for কাপর — but not at 38 seconds.
+
+        What closes most of the gap for free is ranking, not recall: the right
+        word was usually in the pool already and sorted below a coincidence.
+        See `homophone_substitution`, and `_FOLD` for the র/ড় class that had to
+        be corrected before কাপড় was reachable at all.
+
+        Set `BHASHASETU_HUNSPELL_SUGGEST=1` to use spylls anyway — reasonable
+        for CLI or batch work, where latency is nobody's problem.
         """
         cached = self._suggest_cache.get(word)
         if cached is not None:
             return cached[:limit]
+        if not self._use_hunspell_suggester:
+            return super().suggest(word, limit)
         try:
-            candidates = list(self._dict.suggester.suggest(word))
-        except Exception:  # pragma: no cover - suggester is best-effort
+            candidates = list(self._dict.suggest(word))
+        except Exception as exc:  # pragma: no cover - suggester is best-effort
+            # Still best-effort — a suggester that throws must not take the
+            # request down — but never silent again. That silence is what let a
+            # method that never ran look like a working one for this long.
+            if not self._suggester_broken:
+                self._suggester_broken = True
+                print(
+                    f"WARNING: Hunspell suggester failed ({type(exc).__name__}: "
+                    f"{exc}); falling back to the phonetic and length pools. "
+                    "Suggestion quality is degraded, not absent.",
+                    file=sys.stderr,
+                )
             candidates = []
         if not candidates:
             return super().suggest(word, limit)
@@ -274,6 +424,7 @@ def load_default_lexicon() -> BengaliLexicon:
     for group in suffix_cfg.get("suffixes", {}).values():
         suffixes.extend(group)
     prefixes: list[str] = list(suffix_cfg.get("prefixes", []))
+    vowel_final_only: list[str] = list(suffix_cfg.get("vowel_final_only", []))
 
     # Frequency proxy: the seed list is ordered roughly by corpus frequency, so
     # earlier entries outrank later ones on ties. Replace with real counts when
@@ -295,7 +446,11 @@ def load_default_lexicon() -> BengaliLexicon:
     if hunspell_dic.exists():
         try:
             lex = HunspellLexicon(
-                hunspell_dic, suffixes, supplement=[*words, *extra], prefixes=prefixes
+                hunspell_dic,
+                suffixes,
+                supplement=[*words, *extra],
+                prefixes=prefixes,
+                vowel_final_only=vowel_final_only,
             )
         except Exception as exc:
             # Broad on purpose. This used to catch RuntimeError only, which
@@ -319,4 +474,10 @@ def load_default_lexicon() -> BengaliLexicon:
             )
         else:
             return lex
-    return BengaliLexicon([*words, *extra], suffixes, freq, prefixes=prefixes)
+    return BengaliLexicon(
+        [*words, *extra],
+        suffixes,
+        freq,
+        prefixes=prefixes,
+        vowel_final_only=vowel_final_only,
+    )
