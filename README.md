@@ -311,14 +311,14 @@ Measured on 376 error cases and 124 clean sentences:
 | `VERB_INFLECTION` | morphology | 1 | 35 | 0.966 | 0.800 | 0.927 |
 | `NOTVA_SHOTVA` | orthography | 1 | 60 | 1.000 | 0.700 | 0.921 |
 | `AGREEMENT` | syntax | 1 | 25 | 0.889 | 0.320 | 0.656 § |
-| `NON_WORD` | orthography | 1 | 50 | 0.671 | 0.980 | 0.716 ‡ |
+| `NON_WORD` | orthography | 1 | 50 | 0.653 | 0.980 | 0.700 ‡ |
 | `HOMONYM` | orthography | 1 | 27 | 1.000 | 0.148 | 0.465 † |
 | `CASE_MARKER`, `WORD_ORDER`, `POS_ERROR` | — | Phase 2 | 67 | — | — | 0.000 |
 
 ```
 false positives on clean text     0.00%  (0/124)   ceiling 3%
-macro F0.5 (implemented classes)  0.837
-latency p50 / p95 / p99 (ms)      5 / 581 / 674
+macro F0.5 (implemented classes)  0.835
+latency p50 / p95 / p99 (ms)      6 / 603 / 674
 gold set                          353 / 376 human-verified (23 awaiting sign-off)
 ```
 
@@ -345,11 +345,16 @@ surfaced edit that is not the expected one is charged as a false positive to
 whichever class emitted it.
 
 **Known limitation:** p99 latency of 674 ms sits just under the 800 ms budget.
-It is almost entirely Hunspell's suggester on cold unknown words, and the gold
+It is almost entirely candidate generation on cold unknown words, and the gold
 set is unusually dense with them. It is capped at 25 suggester calls per request.
-Teaching the lexicon the numeral compounds (দুইশত, পাঁচশো) took a measurable bite
-out of this for the same reason it removed the false positives: every word the
-dictionary already knows is a suggester call that never happens.
+
+**Suggestions do not come from Hunspell**, despite the dictionary being one.
+spylls' suggester is better — for কাপর it offers কাপড় second — and far too slow
+to run while someone is typing: measured on bn_BD, between 3.5 s (কাপর) and
+16.9 s (সিতকালে) for a single cold word, against a p95 budget of 800 ms for a
+whole document. Candidates come from a phonetic and length-window pool instead,
+re-ranked by sound; `BHASHASETU_HUNSPELL_SUGGEST=1` switches to spylls for CLI
+or batch work where latency is nobody's problem. See `lexicon.py::suggest`.
 
 ---
 

@@ -404,6 +404,82 @@ def test_lexicon_knows_ordinary_words(norm: Callable[[str], str], word: str) -> 
     assert get_pack("bn").lexicon.contains(norm(word))
 
 
+@pytest.mark.parametrize(
+    ("wrong", "right"),
+    [
+        # -র is the genitive after a VOWEL only; after a consonant it is -এর.
+        # Stripping it regardless let কাপর resolve to কাপ + genitive, so the
+        # checker read a misspelling as a real inflected word and reported the
+        # sentence clean. See vowel_final_only in data/suffixes.yaml.
+        ("কাপর", "কাপড়"),
+        ("শিকর", "শিকড়"),
+    ],
+)
+def test_illegal_genitive_is_not_a_free_pass(
+    norm: Callable[[str], str], wrong: str, right: str
+) -> None:
+    lexicon = get_pack("bn").lexicon
+    assert not lexicon.contains(norm(wrong)), f"{wrong} must not pass as a word"
+    assert lexicon.contains(norm(right))
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # The legal side of the same rule: -র after a vowel-final stem.
+        "মা বাবার সঙ্গে নদীর ধারে গেলেন।",
+        "ছেলের বই মেয়ের ব্যাগে।",
+        "আমি ঘরের ভিতরে আছি।",
+    ],
+)
+def test_legal_genitives_still_pass(pipeline: Pipeline, text: str) -> None:
+    assert ErrorClass.NON_WORD not in classes(pipeline.check(text))
+
+
+@pytest.mark.parametrize(
+    ("wrong", "expected"),
+    [
+        # The suggestion has to be the word the writer meant, or the flag is
+        # worse than silence — the user acts on it. Each of these was ranked
+        # below a coincidence before: ড়/র were in different sound classes, so
+        # কাপড় was not even reachable, and কপার ("copper") won the tie on sort
+        # order alone.
+        ("কাপর", "কাপড়"),
+        ("শিকর", "শিকড়"),
+        ("কারন", "কারণ"),
+        ("বিখ্যত", "বিখ্যাত"),
+        # Reached only by correcting the stem and re-attaching the suffix: the
+        # dictionary holds পুকুরপাড়, and the inflected form is three edits from
+        # it. Before, this word got no suggestion at all and was held below the
+        # confidence gate — the checker simply said nothing about it.
+        ("পূকুরপারে", "পুকুরপাড়ে"),
+    ],
+)
+def test_top_suggestion_is_the_intended_word(
+    norm: Callable[[str], str], wrong: str, expected: str
+) -> None:
+    suggestions = get_pack("bn").lexicon.suggest(norm(wrong), limit=5)
+    assert suggestions, f"no suggestion at all for {wrong}"
+    assert suggestions[0] == norm(expected), f"{wrong} -> {suggestions}"
+
+
+def test_rra_and_ra_share_a_sound_class(norm: Callable[[str], str]) -> None:
+    """The docstring in phonetic.py always claimed র ড় ঢ় merge; the fold table
+    put ড় ঢ় with the dental stops, so they did not.
+
+    Through `norm`, like every other Bengali literal here: ড় has a decomposed
+    encoding that looks identical on screen, and soundex reads it as ড plus a
+    dropped nukta. Stage 0 composes before any of this runs.
+    """
+    from bhashasetu.language_packs.bn.phonetic import homophone_substitution, soundex
+
+    ra, rra = norm("কাপর"), norm("কাপড়")
+    assert soundex(ra) == soundex(rra)
+    assert homophone_substitution(ra, rra)
+    # One swap, but across sound classes - not the same signal.
+    assert not homophone_substitution(ra, norm("কাগর"))
+
+
 def test_dilam_is_not_mislabelled_sadhu() -> None:
     """The stem-length guard. করিলাম is সাধু, দিলাম is চলিত, and they end in the
     same four characters - see register.yaml.

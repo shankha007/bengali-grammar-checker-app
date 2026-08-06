@@ -93,6 +93,17 @@ const CASES = [
   { name: "clean-comma-clause", text: "তিনি খুব ভালো মানুষ, সবাই জানে।", want: null },
   { name: "clean-day-noun", text: "আমি সেখানে তিন দিন ছিলাম।", want: null },
   { name: "clean-numeral-compound", text: "তিনশত টাকা লাগবে।", want: null },
+
+  // Misspellings that ended in a legal-looking suffix and so were accepted in
+  // silence: -র was stripped off a consonant-final stem, which Bengali does not
+  // allow (the genitive there is -এর). কাপর resolved to কাপ + genitive and the
+  // whole sentence came back clean.
+  { name: "illegal-genitive-kapor", text: "মা কাপর কাচছিলেন।", want: "NON_WORD" },
+  { name: "illegal-genitive-shikor", text: "তার শিকর অনেক গভীরে।", want: "NON_WORD" },
+
+  // Legal genitives after a vowel-final stem, which the same rule must not touch.
+  { name: "clean-genitive-vowel", text: "মা বাবার সঙ্গে নদীর ধারে গেলেন।", want: null },
+  { name: "clean-genitive-chhele", text: "ছেলের বই মেয়ের ব্যাগে।", want: null },
 ];
 
 async function launch() {
