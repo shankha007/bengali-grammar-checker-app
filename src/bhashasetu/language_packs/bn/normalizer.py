@@ -122,7 +122,6 @@ _SMART_PUNCT_FOLD = [
 class BengaliNormalizerConfig:
     convert_bijoy: bool = True
     fold_bengali_digits: bool = False  # both forms are correct; off by default
-    normalize_dandas: bool = True
 
 
 class BengaliNormalizer:
@@ -158,8 +157,15 @@ class BengaliNormalizer:
         buf.replace_all(_VOWEL_COMPOSE, "compose_vowel_signs")
         buf.replace_all(_SMART_PUNCT_FOLD, "punct_fold")
         self._collapse_repeats(buf, C.HASANTA, "collapse_hasanta")
-        if self.config.normalize_dandas:
-            buf.replace_all([(C.DARI + C.DARI, C.DOUBLE_DARI)], "double_dari")
+        # `।।` is deliberately NOT folded into `॥` here.
+        #
+        # It used to be, and the fold was silently swallowing a typo: a doubled
+        # dari is the commonest punctuation slip there is, and rewriting it into
+        # the verse terminator made it a legal character before Stage 1 ever saw
+        # it — so the user got no underline, no row in the table, and no hint
+        # that anything was wrong. Stage 0 is for changes the writer could not
+        # disagree with; "you meant the verse mark" is not one of those.
+        # `_REPEATED` in rules.py flags it now, with a suggestion.
         if self.config.fold_bengali_digits:
             buf.replace_all(
                 list(zip(C.DIGITS, C.ASCII_DIGITS, strict=True)), "fold_digits"

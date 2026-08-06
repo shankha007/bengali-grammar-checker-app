@@ -112,3 +112,41 @@
 উঠব
 উঠবে
 উঠবি
+
+# --- numeral compounds in শত / শো / হাজার.
+#
+# "আজকের সভায় প্রায় দুইশত জন উপস্থিত ছিলেন।" was flagged NON_WORD and offered
+# দুই, দুইটা, দুইটি — three suggestions, none of them the word the writer
+# wanted, on a sentence with nothing wrong with it. bn_BD lists the bare
+# numerals and শত/শো/হাজার separately but not the compounds, and the affix
+# table has no rule that builds them, so every "N hundred" in ordinary prose
+# came back as a spelling error. These are written solid in standard Bengali,
+# so there is no correct alternative spelling to point at either.
+একশত
+একশো
+দুইশত
+দুশো
+দুইশো
+তিনশত
+তিনশো
+চারশত
+চারশো
+পাঁচশত
+পাঁচশো
+ছয়শত
+ছয়শো
+সাতশত
+সাতশো
+আটশত
+আটশো
+নয়শত
+নয়শো
+দেড়শো
+দেড়শত
+আড়াইশো
+আড়াইশত
+একহাজার
+দুইহাজার
+হাজারখানেক
+শতাধিক
+সহস্রাধিক

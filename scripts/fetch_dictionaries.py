@@ -23,6 +23,11 @@ import sys
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _console import use_utf8
+
+use_utf8()
+
 DEST = (
     Path(__file__).resolve().parents[1]
     / "src" / "bhashasetu" / "language_packs" / "bn" / "data" / "hunspell"

@@ -31,6 +31,11 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _console import use_utf8
+
+use_utf8()
+
 ROOT = Path(__file__).resolve().parent.parent
 GOLD = ROOT / "eval" / "gold" / "bn" / "errors"
 OUT = ROOT / "frontend" / "lib" / "samples.ts"

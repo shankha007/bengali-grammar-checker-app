@@ -28,6 +28,28 @@ app = typer.Typer(
 identity_app = typer.Typer(help="Anonymous identity utilities (spec §5).")
 app.add_typer(identity_app, name="identity")
 
+
+def _utf8_streams() -> None:
+    """Force UTF-8 on stdout/stderr.
+
+    On Windows these default to the system ANSI codepage — cp1252 on an English
+    install — which cannot encode a single Bengali letter. Every command here
+    prints Bengali, so `bhashasetu check "এর কারন কী?"`, the first command in
+    the README, died with a UnicodeEncodeError traceback rather than printing a
+    table. `bhashasetu eval` died on the Δ in a column header before it got as
+    far as the Bengali.
+
+    Rich picks up the stream's encoding when the Console is constructed, so this
+    has to run first. `errors="replace"` keeps a console that genuinely cannot
+    render the script printing boxes instead of losing the whole report.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8", errors="replace")
+
+
+_utf8_streams()
 console = Console()
 
 

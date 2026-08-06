@@ -49,8 +49,6 @@ subjects:
   আপনি: second_honorific
   আপনারা: second_honorific
   সে: third_familiar
-  ও: third_familiar
-  এ: third_familiar
   তারা: third_familiar
   ওরা: third_familiar
   এরা: third_familiar
@@ -60,6 +58,25 @@ subjects:
   উনি: third_honorific
   তাঁরা: third_honorific
   তাঁহারা: third_honorific
+
+# Words that ARE third-person pronouns and are also something far commoner.
+# They count toward the "how many subjects are in this sentence" test — so
+# "সে ও আমি যাব।" still bails out with two candidates — but they are never
+# themselves used as THE subject to judge a verb against.
+#
+# ও is the killer. It is the pronoun "he/she", and it is also the conjunction
+# "and", which is how it is used in nearly all real prose: "রাম ও শ্যাম বাজারে
+# গেলেন।" is correct Bengali, and reading ও as the subject made গেলেন — a
+# perfectly good honorific plural — disagree with a third-person-familiar
+# pronoun that is not there. Same story for এ, which is the demonstrative
+# determiner in "এ কথা সবাই জানেন।" far more often than it is a bare pronoun.
+#
+# Disambiguating them needs a POS tagger, which is Phase 2. Until then the
+# honest move is the one the rest of this file makes everywhere else: when the
+# subject is not certain, say nothing. The cost is that "ও আসবেন।" goes
+# unflagged; the benefit is that ordinary coordinated prose stops being
+# underlined, and spec §8 prices that trade for us.
+ambiguous_subjects: ["ও", "এ"]
 
 # A noun carrying a classifier is a third-person subject, and not an honorific
 # one: ছেলেটি খেলছেন is wrong for the same reason সে খেলছেন is. Used ONLY when
@@ -81,6 +98,21 @@ classifier_min_stem: 2
 clause_breaks: ["যে", "বলে", "এবং", "কিন্তু", "আর", "তাই", "যখন", "যদি",
                 "তারপর", "অথবা", "কারণ", "যাতে", "নাকি"]
 
+# Punctuation that ends a clause just as firmly as the conjunctions above.
+#
+# These are invisible to `clause_breaks`, because that list is matched against
+# word tokens and the tokenizer does not emit punctuation as a word. So
+# "তিনি খুব ভালো মানুষ, সবাই জানে।" had its comma pass straight through: the
+# rule carried তিনি across into the second clause, met জানে, and reported that
+# a third-person-honorific subject needs জানেন — on a sentence whose second
+# clause has its own subject, সবাই. Bengali marks that boundary with a comma
+# and nothing else, so the comma has to count.
+#
+# The plain hyphen is deliberately absent: in Bengali it joins compounds
+# (ণত্ব-বিধান, ভারত-বাংলাদেশ) far more often than it separates clauses, and the
+# tokenizer already splits on it, so listing it would end clauses mid-word.
+clause_break_punctuation: [",", ";", ":", "—", "–"]
+
 # Skipped when looking for the finite verb at the end of a clause — they follow
 # it: "আপনি এই বইটি পড়েছ কি?"
 final_particles: ["কি", "কী", "না", "তো", "নাকি", "কিনা"]
@@ -89,7 +121,18 @@ final_particles: ["কি", "কী", "না", "তো", "নাকি", "ক�
 # perfect first-person past, and নিলাম is also the noun "auction", so
 # "সে বাজার থেকে ফল নিলাম বলে জানাল।" — correct prose — came back as a পুরুষ
 # error. এসব is এস + ব by the same accident.
-not_verbs: ["নিলাম", "এসব", "সব", "কিছু", "আলাদা", "সালাম"]
+#
+# দিন is the same accident and a much commoner one. দি + ন is a well-formed
+# honorific imperative ("give"), and দিন is also the everyday noun "day" — so
+# "আমি সেখানে তিন দিন ছিলাম।" and "ছেলেটি অনেক দিন পরে এল।" both came back
+# claiming the writer had used the wrong person on a verb that is not there.
+# The noun outnumbers the imperative by a wide margin in ordinary prose, and
+# the imperative reading only ever fires here when it DISAGREES with the
+# subject, which is the rarer case still.
+#
+# নামে is নাম + ে, "descends", and also the noun নাম in the locative
+# ("তার নামে", "এই নামে পরিচিত").
+not_verbs: ["নিলাম", "এসব", "সব", "কিছু", "আলাদা", "সালাম", "দিন", "নামে"]
 
 # A verb candidate is skipped when the word before it is one of these: the two
 # together are a fixed phrase, not a predication. "দয়া করে" is "please", and
